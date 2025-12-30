@@ -11,8 +11,8 @@ export const useGetTemplates = (apiQuery: RequestType) => {
     queryKey: [
       "templates",
       {
-        page: 1,
-        limit: 4,
+        page: apiQuery.page,
+        limit: apiQuery.limit,
       },
     ],
     queryFn: async () => {
