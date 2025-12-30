@@ -19,7 +19,7 @@ export const TemplatesSection = () => {
     data, 
     isLoading, 
     isError
-  } = useGetTemplates({ page: "1", limit: "4" });
+  } = useGetTemplates({ page: 1, limit: 4 });
 
   const onClick = (template: ResponseType["data"][0]) => {
     if (template.isPro && shouldBlock) {
