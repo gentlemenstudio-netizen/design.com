@@ -17,9 +17,9 @@ interface EditorProjectIdPageProps {
 const EditorProjectIdPage = ({
   params,
 }: EditorProjectIdPageProps) => {
-  const { 
-    data, 
-    isLoading, 
+  const {
+    data,
+    isLoading,
     isError
   } = useGetProject(params.projectId);
 
@@ -49,5 +49,5 @@ const EditorProjectIdPage = ({
 
   return <Editor initialData={data} />
 };
- 
+
 export default EditorProjectIdPage;
