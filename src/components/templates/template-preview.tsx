@@ -28,7 +28,18 @@ export const TemplatePreview = ({
         });
 
         canvas.loadFromJSON(json, () => {
+            const originalWidth = json.width || 300;
+            const originalHeight = json.height || 300;
+
+            const scaleX = width / originalWidth;
+            const scaleY = height / originalHeight;
+            const scale = Math.min(scaleX, scaleY);
+
             canvas.getObjects().forEach((obj) => {
+                obj.scaleX! *= scale;
+                obj.scaleY! *= scale;
+                obj.left! *= scale;
+                obj.top! *= scale;
                 obj.selectable = false;
                 obj.evented = false;
             });
