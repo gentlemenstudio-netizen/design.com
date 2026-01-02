@@ -12,8 +12,8 @@ interface TemplatePreviewProps {
 
 export const TemplatePreview = ({
     json,
-    width = 500,
-    height = 500,
+    width = 900,
+    height = 900,
     onClick,
 }: TemplatePreviewProps) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
