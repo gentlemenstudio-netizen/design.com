@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeTemplate } from "@/lib/normalize-template";
 import { fabric } from "fabric";
 import { useEffect, useRef } from "react";
 
@@ -12,8 +13,8 @@ interface TemplatePreviewProps {
 
 export const TemplatePreview = ({
     json,
-    width = 900,
-    height = 900,
+    width = 260,
+    height = 260,
     onClick,
 }: TemplatePreviewProps) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -26,26 +27,31 @@ export const TemplatePreview = ({
             height,
             selection: false,
         });
+        (async () => {
+            const normalized = await normalizeTemplate(json);
 
-        canvas.loadFromJSON(json, () => {
-            const originalWidth = json.width || 300;
-            const originalHeight = json.height || 300;
+            canvas.loadFromJSON(normalized, () => {
+                canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
 
-            const scaleX = width / originalWidth;
-            const scaleY = height / originalHeight;
-            const scale = Math.min(scaleX, scaleY);
+                const scale = Math.min(
+                    width / normalized.width,
+                    height / normalized.height
+                );
 
-            canvas.getObjects().forEach((obj) => {
-                obj.scaleX! *= scale;
-                obj.scaleY! *= scale;
-                obj.left! *= scale;
-                obj.top! *= scale;
-                obj.selectable = false;
-                obj.evented = false;
+                canvas.setZoom(scale);
+                canvas.relativePan({
+                    x: (width / scale - normalized.width) / 2,
+                    y: (height / scale - normalized.height) / 2,
+                });
+
+                canvas.getObjects().forEach((obj) => {
+                    obj.selectable = false;
+                    obj.evented = false;
+                });
+
+                canvas.renderAll();
             });
-
-            canvas.renderAll();
-        });
+        })();
 
         return () => {
             canvas.dispose();
