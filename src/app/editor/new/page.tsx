@@ -1,21 +1,24 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
-import { Editor } from "@/features/editor/components/editor";
 import { injectTemplateVariables } from "@/lib/inject-template";
 import { loadTemplateById } from "@/lib/load-template-by-id";
+import { Editor } from "@/features/editor/components/editor";
 
+interface EditorNewPageProps {
+    searchParams: {
+        template?: string;
+        brand?: string;
+    };
+}
 
 const DEFAULT_SIZE = {
     width: 800,
     height: 800,
 };
 
-const EditorNewPage = () => {
-    const searchParams = useSearchParams();
-
-    const templateId = searchParams.get("template");
-    const brand = searchParams.get("brand") || "Your Brand";
+export default function EditorNewPage({
+    searchParams,
+}: EditorNewPageProps) {
+    const templateId = searchParams.template;
+    const brand = searchParams.brand || "Your Brand";
 
     if (!templateId) {
         return (
@@ -25,10 +28,8 @@ const EditorNewPage = () => {
         );
     }
 
-    // Load JSON from /templates/logo/*.json
     const template = loadTemplateById("logo", templateId);
 
-    // Inject dynamic values
     const injectedJson = injectTemplateVariables(
         template.json,
         { BRAND_NAME: brand }
@@ -51,6 +52,4 @@ const EditorNewPage = () => {
             }}
         />
     );
-};
-
-export default EditorNewPage;
+}
