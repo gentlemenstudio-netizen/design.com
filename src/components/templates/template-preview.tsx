@@ -12,8 +12,8 @@ interface TemplatePreviewProps {
 
 export const TemplatePreview = ({
     json,
-    width = 900,
-    height = 900,
+    width = 300,
+    height = 300,
     onClick,
 }: TemplatePreviewProps) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -28,8 +28,8 @@ export const TemplatePreview = ({
         });
 
         canvas.loadFromJSON(json, () => {
-            const originalWidth = json.width || 900;
-            const originalHeight = json.height || 900;
+            const originalWidth = json.width || 300;
+            const originalHeight = json.height || 300;
 
             const scaleX = width / originalWidth;
             const scaleY = height / originalHeight;
