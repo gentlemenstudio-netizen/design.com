@@ -1,6 +1,5 @@
 "use client";
 
-import { normalizeTemplate } from "@/lib/normalize-template";
 import { fabric } from "fabric";
 import { useEffect, useRef } from "react";
 
@@ -18,52 +17,98 @@ export const TemplatePreview = ({
     onClick,
 }: TemplatePreviewProps) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const fabricRef = useRef<fabric.Canvas | null>(null);
+    const mountedRef = useRef(true);
 
     useEffect(() => {
+        mountedRef.current = true;
         if (!canvasRef.current) return;
 
         const canvas = new fabric.Canvas(canvasRef.current, {
             width,
             height,
             selection: false,
+            renderOnAddRemove: false,
         });
-        (async () => {
-            const normalized = await normalizeTemplate(json);
 
-            canvas.loadFromJSON(normalized, () => {
-                canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        fabricRef.current = canvas;
 
-                const scale = Math.min(
-                    width / normalized.width,
-                    height / normalized.height
-                );
+        canvas.loadFromJSON(json, () => {
+            if (!mountedRef.current) return;
 
-                canvas.setZoom(scale);
-                canvas.relativePan({
-                    x: (width / scale - normalized.width) / 2,
-                    y: (height / scale - normalized.height) / 2,
-                });
+            // 🔹 RESET viewport (critical)
+            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
 
-                canvas.getObjects().forEach((obj) => {
-                    obj.selectable = false;
-                    obj.evented = false;
-                });
+            // 🔹 Compute bounds of all objects
+            const objects = canvas.getObjects();
+            if (!objects.length) return;
 
-                canvas.renderAll();
+            let minX = Infinity,
+                minY = Infinity,
+                maxX = -Infinity,
+                maxY = -Infinity;
+
+            objects.forEach((obj) => {
+                const rect = obj.getBoundingRect(true, true);
+                minX = Math.min(minX, rect.left);
+                minY = Math.min(minY, rect.top);
+                maxX = Math.max(maxX, rect.left + rect.width);
+                maxY = Math.max(maxY, rect.top + rect.height);
             });
-        })();
+
+            const contentWidth = maxX - minX;
+            const contentHeight = maxY - minY;
+
+            // 🔹 Scale to fit preview
+            const scale = Math.min(
+                width / contentWidth,
+                height / contentHeight
+            );
+
+            canvas.setZoom(scale);
+
+            // 🔹 Center content
+            canvas.absolutePan({
+                x: minX * scale - (width - contentWidth * scale) / 2,
+                y: minY * scale - (height - contentHeight * scale) / 2,
+            });
+
+            // 🔹 Disable interactions
+            objects.forEach((obj) => {
+                obj.selectable = false;
+                obj.evented = false;
+            });
+
+            canvas.renderAll();
+        });
 
         return () => {
-            canvas.dispose();
+            mountedRef.current = false;
+            fabricRef.current?.dispose();
+            fabricRef.current = null;
         };
     }, [json, width, height]);
 
     return (
         <div
             onClick={onClick}
-            className="cursor-pointer rounded-lg border bg-white p-2 hover:ring-2 hover:ring-primary transition"
+            className="
+    cursor-pointer
+    rounded-xl
+    border
+    bg-white
+    aspect-square
+    flex
+    items-center
+    justify-center
+    p-4
+    transition
+    hover:shadow-md
+    hover:border-primary
+  "
         >
-            <canvas ref={canvasRef} />
+            <canvas ref={canvasRef} className="max-w-full max-h-full" />
         </div>
+
     );
 };
