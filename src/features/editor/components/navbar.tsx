@@ -4,12 +4,12 @@ import { CiFileOn } from "react-icons/ci";
 import { BsCloudCheck, BsCloudSlash } from "react-icons/bs";
 import { useFilePicker } from "use-file-picker";
 import { useMutationState } from "@tanstack/react-query";
-import { 
-  ChevronDown, 
-  Download, 
-  Loader, 
-  MousePointerClick, 
-  Redo2, 
+import {
+  ChevronDown,
+  Download,
+  Loader,
+  MousePointerClick,
+  Redo2,
   Undo2
 } from "lucide-react";
 
@@ -34,6 +34,7 @@ interface NavbarProps {
   editor: Editor | undefined;
   activeTool: ActiveTool;
   onChangeActiveTool: (tool: ActiveTool) => void;
+  onSaveTemplate?: () => void; // 👈 ADD THIS
 };
 
 export const Navbar = ({
@@ -41,6 +42,7 @@ export const Navbar = ({
   editor,
   activeTool,
   onChangeActiveTool,
+  onSaveTemplate
 }: NavbarProps) => {
   const data = useMutationState({
     filters: {
@@ -127,7 +129,7 @@ export const Navbar = ({
           </Button>
         </Hint>
         <Separator orientation="vertical" className="mx-2" />
-        {isPending && ( 
+        {isPending && (
           <div className="flex items-center gap-x-2">
             <Loader className="size-4 animate-spin text-muted-foreground" />
             <div className="text-xs text-muted-foreground">
@@ -135,7 +137,7 @@ export const Navbar = ({
             </div>
           </div>
         )}
-        {!isPending && isError && ( 
+        {!isPending && isError && (
           <div className="flex items-center gap-x-2">
             <BsCloudSlash className="size-[20px] text-muted-foreground" />
             <div className="text-xs text-muted-foreground">
@@ -143,13 +145,21 @@ export const Navbar = ({
             </div>
           </div>
         )}
-        {!isPending && !isError && ( 
+        {!isPending && !isError && (
           <div className="flex items-center gap-x-2">
             <BsCloudCheck className="size-[20px] text-muted-foreground" />
             <div className="text-xs text-muted-foreground">
               Saved
             </div>
           </div>
+        )}
+        {onSaveTemplate && (
+          <Button
+            variant="secondary"
+            onClick={onSaveTemplate}
+          >
+            Save as Template
+          </Button>
         )}
         <div className="ml-auto flex items-center gap-x-4">
           <DropdownMenu modal={false}>

@@ -2,7 +2,7 @@ import { LogoTemplateClient } from "@/components/templates/logo-template-client"
 import { loadTemplates } from "@/lib/templates";
 
 export default async function LogoTemplatesPage() {
-    const templates = loadTemplates("logo");
+    const templates = await loadTemplates("logo");
 
     return (
         <div className="p-6">

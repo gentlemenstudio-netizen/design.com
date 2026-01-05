@@ -1,19 +1,12 @@
-import fs from "fs";
-import path from "path";
+import { db } from "@/db/drizzle";
+import { templates } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 
-export function loadTemplates(type: "logo") {
-    const dir = path.join(process.cwd(), "templates", type);
-    const files = fs.readdirSync(dir);
 
-    return files.map((file) => {
-        const content = fs.readFileSync(
-            path.join(dir, file),
-            "utf-8"
-        );
-
-        return {
-            id: file.replace(".json", ""),
-            canvas: JSON.parse(content),
-        };
-    });
+export async function loadTemplates(type: "logo") {
+    return await db
+        .select()
+        .from(templates)
+        .where(eq(templates.category, "logo"))
+        .orderBy(desc(templates.createdAt));
 }

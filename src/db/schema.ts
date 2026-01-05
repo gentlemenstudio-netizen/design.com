@@ -2,14 +2,16 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import {
   boolean,
+  uuid,
   timestamp,
   pgTable,
   text,
+  jsonb,
   primaryKey,
   integer,
 } from "drizzle-orm/pg-core"
 import type { AdapterAccountType } from "next-auth/adapters"
- 
+
 export const users = pgTable("user", {
   id: text("id")
     .primaryKey()
@@ -18,7 +20,7 @@ export const users = pgTable("user", {
   email: text("email").notNull(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
-  password: text("password"), 
+  password: text("password"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -48,7 +50,7 @@ export const accounts = pgTable(
     }),
   })
 )
- 
+
 export const sessions = pgTable("session", {
   sessionToken: text("sessionToken").primaryKey(),
   userId: text("userId")
@@ -56,7 +58,7 @@ export const sessions = pgTable("session", {
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
 })
- 
+
 export const verificationTokens = pgTable(
   "verificationToken",
   {
@@ -70,7 +72,7 @@ export const verificationTokens = pgTable(
     }),
   })
 )
- 
+
 export const authenticators = pgTable(
   "authenticator",
   {
@@ -137,4 +139,27 @@ export const subscriptions = pgTable("subscription", {
   currentPeriodEnd: timestamp("currentPeriodEnd", { mode: "date" }),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull(),
   updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+});
+
+
+/**
+ * Templates table
+ * Used for Logo / Business Card / Flyer templates
+ */
+export const templates = pgTable("templates", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  name: text("name").notNull(),
+
+  category: text("category").notNull(),
+  // "logo" | "business-card" | "flyer"
+
+  json: jsonb("json").notNull(),
+
+  width: integer("width").notNull(),
+  height: integer("height").notNull(),
+
+  createdBy: text("created_by"),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });

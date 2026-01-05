@@ -11,7 +11,11 @@ import { TemplatePreview } from "@/components/templates/template-preview";
  */
 interface LogoTemplate {
     id: string;
-    canvas: any;
+    name: string;
+    category: string;
+    json: any;
+    width: number;
+    height: number;
 }
 
 interface LogoTemplateClientProps {
@@ -38,7 +42,7 @@ export const LogoTemplateClient = ({
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {templates.map((template) => {
                     const injectedJson = injectTemplateVariables(
-                        template.canvas,
+                        template.json,
                         { BRAND_NAME: brand || "Your Brand" }
                     );
 
