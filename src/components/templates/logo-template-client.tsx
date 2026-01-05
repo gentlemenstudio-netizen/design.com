@@ -38,8 +38,8 @@ export const LogoTemplateClient = ({
                     height: template.height,
                     ...template.json,
                 }),
-                width: template.width,
-                height: template.height,
+                width: 900,
+                height: 900,
             }),
         });
 
