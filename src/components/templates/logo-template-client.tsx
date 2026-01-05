@@ -27,6 +27,31 @@ export const LogoTemplateClient = ({
 }: LogoTemplateClientProps) => {
     const [brand, setBrand] = useState("");
     const router = useRouter();
+    const onUseTemplate = async (template: LogoTemplate) => {
+        const res = await fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: template.name,
+                json: {
+                    width: template.width,
+                    height: template.height,
+                    ...template.json,
+                },
+                width: template.width,
+                height: template.height,
+            }),
+        });
+
+        const result = await res.json();
+
+        if (!result?.data?.id) {
+            alert("Failed to create project");
+            return;
+        }
+
+        router.push(`/editor/${result.data.id}`);
+    };
 
     return (
         <div className="space-y-6">
@@ -50,11 +75,7 @@ export const LogoTemplateClient = ({
                         <TemplatePreview
                             key={template.id}
                             json={injectedJson}
-                            onClick={() =>
-                                router.push(
-                                    `/editor/new?template=${template.id}&brand=${brand}`
-                                )
-                            }
+                            onClick={() => onUseTemplate(template)}
                         />
                     );
                 })}
