@@ -204,7 +204,6 @@ export type BuildEditorProps = {
 };
 
 export interface Editor {
-  [x: string]: any;
   savePng: () => void;
   saveJpg: () => void;
   saveSvg: () => void;

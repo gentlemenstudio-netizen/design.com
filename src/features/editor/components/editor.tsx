@@ -116,7 +116,7 @@ export const Editor = ({ initialData }: EditorProps) => {
       />
       {saveTemplateOpen && editor && (
         <SaveTemplateModal
-          json={editor.toJSON()}
+          json={editor.canvas.toJSON()}
           width={editor.canvas.getWidth()}
           height={editor.canvas.getHeight()}
           onClose={() => setSaveTemplateOpen(false)}
