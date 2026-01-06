@@ -1,14 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { injectTemplateVariables } from "@/lib/inject-template";
 import { TemplatePreview } from "@/components/templates/template-preview";
 
-/**
- * Strongly typed template structure
- */
 interface LogoTemplate {
     id: string;
     name: string;
@@ -18,23 +15,50 @@ interface LogoTemplate {
     height: number;
 }
 
-interface LogoTemplateClientProps {
+interface Props {
     templates: LogoTemplate[];
 }
 
-export const LogoTemplateClient = ({
-    templates,
-}: LogoTemplateClientProps) => {
-    const [brand, setBrand] = useState("");
+export const LogoTemplateClient = ({ templates }: Props) => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // 🔹 Initial values from URL
+    const initialBrand = searchParams.get("brand") || "";
+    const initialTagline = searchParams.get("tagline") || "";
+
+    // 🔹 Input state (editable)
+    const [brandInput, setBrandInput] = useState(initialBrand);
+    const [taglineInput, setTaglineInput] = useState(initialTagline);
+
+    // 🔹 Applied values (used for rendering)
+    const [appliedBrand, setAppliedBrand] = useState(initialBrand);
+    const [appliedTagline, setAppliedTagline] = useState(initialTagline);
+
+    const onApply = () => {
+        setAppliedBrand(brandInput);
+        setAppliedTagline(taglineInput);
+
+        router.replace(
+            `/logos/templates?brand=${encodeURIComponent(
+                brandInput
+            )}&tagline=${encodeURIComponent(taglineInput)}`
+        );
+    };
+
     const onUseTemplate = async (template: LogoTemplate) => {
+        const injectedJson = injectTemplateVariables(template.json, {
+            BRAND_NAME: appliedBrand || "Your Brand",
+            TAGLINE: appliedTagline || "",
+        });
+
         const res = await fetch("/api/projects", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                name: template.name,
+                name: `${appliedBrand || "Brand"} Logo`,
                 json: JSON.stringify({
-                    ...template.json,
+                    ...injectedJson,
                 }),
                 width: template.width,
                 height: template.height,
@@ -42,37 +66,51 @@ export const LogoTemplateClient = ({
         });
 
         const result = await res.json();
-
-        if (!result?.data?.id) {
-            alert("Failed to create project");
-            return;
-        }
-
         router.push(`/editor/${result.data.id}`);
     };
 
     return (
         <div className="space-y-6">
-            {/* Brand input */}
-            <input
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-                placeholder="Enter your brand name"
-                className="border rounded px-4 py-2 w-full max-w-sm"
-            />
+            {/* 🔹 Header inputs */}
+            <div className="flex flex-wrap gap-4 items-end">
+                <div>
+                    <label className="block text-sm mb-1">Brand name</label>
+                    <input
+                        value={brandInput}
+                        onChange={(e) => setBrandInput(e.target.value)}
+                        className="border rounded px-3 py-2 w-64"
+                    />
+                </div>
 
-            {/* Templates grid */}
+                <div>
+                    <label className="block text-sm mb-1">Tagline</label>
+                    <input
+                        value={taglineInput}
+                        onChange={(e) => setTaglineInput(e.target.value)}
+                        className="border rounded px-3 py-2 w-64"
+                    />
+                </div>
+
+                <button
+                    onClick={onApply}
+                    className="bg-black text-white px-5 py-2 rounded"
+                >
+                    Search
+                </button>
+            </div>
+
+            {/* 🔹 Templates grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {templates.map((template) => {
-                    const injectedJson = injectTemplateVariables(
-                        template.json,
-                        { BRAND_NAME: brand || "Your Brand" }
-                    );
+                    const previewJson = injectTemplateVariables(template.json, {
+                        BRAND_NAME: appliedBrand || "Your Brand",
+                        TAGLINE: appliedTagline || "",
+                    });
 
                     return (
                         <TemplatePreview
                             key={template.id}
-                            json={injectedJson}
+                            json={previewJson}
                             onClick={() => onUseTemplate(template)}
                         />
                     );
