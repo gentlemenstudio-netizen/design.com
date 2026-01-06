@@ -22,8 +22,19 @@ export const SaveTemplateModal = ({
 
     const onSave = async () => {
         setLoading(true);
-        const dataUrl = editor.canvas.toJSON(JSON_KEYS);
+
+        const canvas = editor.canvas;
+
+        // 1️⃣ Export Fabric JSON correctly
+        const dataUrl = canvas.toJSON(JSON_KEYS);
         await transformText(dataUrl.objects);
+
+        // 2️⃣ Build the template JSON (correct shape)
+        const templateJson = {
+            width: canvas.getWidth(),
+            height: canvas.getHeight(),
+            ...dataUrl,
+        };
 
         await fetch("/api/templates", {
             method: "POST",
@@ -31,9 +42,9 @@ export const SaveTemplateModal = ({
             body: JSON.stringify({
                 name: name || "Template",
                 category,
-                dataUrl,
-                width: "300",
-                height: "300",
+                json: templateJson,        // ✅ correct key
+                width: canvas.getWidth(),  // ✅ number
+                height: canvas.getHeight() // ✅ number
             }),
         });
 
