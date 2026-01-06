@@ -2,26 +2,28 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { JSON_KEYS } from "@/features/editor/types";
+import { transformText } from "@/features/editor/utils";
 
 interface Props {
-    json: any;
-    width: number;
-    height: number;
+    editor: any;
     onClose: () => void;
 }
 
 export const SaveTemplateModal = ({
-    json,
-    width,
-    height,
+    editor,
     onClose,
 }: Props) => {
     const [name, setName] = useState("");
     const [category, setCategory] = useState("logo");
     const [loading, setLoading] = useState(false);
 
+
+
     const onSave = async () => {
         setLoading(true);
+        const dataUrl = editor.canvas.toJSON(JSON_KEYS);
+        await transformText(dataUrl.objects);
 
         await fetch("/api/templates", {
             method: "POST",
@@ -29,9 +31,9 @@ export const SaveTemplateModal = ({
             body: JSON.stringify({
                 name: name || "Template",
                 category,
-                json,
-                width,
-                height,
+                dataUrl,
+                width: "300",
+                height: "300",
             }),
         });
 
