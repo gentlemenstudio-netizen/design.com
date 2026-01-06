@@ -33,7 +33,9 @@ export const LogoTemplateClient = ({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 name: template.name,
-                json: template.json,
+                json: JSON.stringify({
+                    ...template.json,
+                }),
                 width: template.width,
                 height: template.height,
             }),
