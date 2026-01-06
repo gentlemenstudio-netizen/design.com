@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { injectTemplateVariables } from "@/lib/inject-template";
 import { TemplatePreview } from "@/components/templates/template-preview";
 
-interface LogoTemplate {
+interface DesignTemplate {
     id: string;
     name: string;
     category: string;
@@ -16,10 +16,10 @@ interface LogoTemplate {
 }
 
 interface Props {
-    templates: LogoTemplate[];
+    templates: DesignTemplate[];
 }
 
-export const LogoTemplateClient = ({ templates }: Props) => {
+export const DesignTemplateClient = ({ templates }: Props) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -46,7 +46,7 @@ export const LogoTemplateClient = ({ templates }: Props) => {
         );
     };
 
-    const onUseTemplate = async (template: LogoTemplate) => {
+    const onUseTemplate = async (template: DesignTemplate) => {
         const injectedJson = injectTemplateVariables(template.json, {
             BRAND_NAME: appliedBrand || "Your Brand",
             TAGLINE: appliedTagline || "",
