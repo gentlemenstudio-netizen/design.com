@@ -56,7 +56,7 @@ export const DesignTemplateClient = ({ templates }: Props) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                name: `${appliedBrand || "Brand"} Logo`,
+                name: `${appliedBrand || "Brand"} Design`,
                 json: JSON.stringify({
                     ...injectedJson,
                 }),

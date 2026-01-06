@@ -1,5 +1,6 @@
 import { Navbar } from "../(dashboard)/navbar";
-import { Sidebar } from "./sidebar";
+import { Sidebar } from "../(dashboard)/sidebar";
+
 
 
 interface CreatorLayoutProps {
