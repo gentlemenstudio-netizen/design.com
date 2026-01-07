@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
+import {
+  Inter,
+  Poppins,
+  Montserrat,
+  Playfair_Display,
+  Raleway,
+  Bebas_Neue,
+  Oswald,
+} from "next/font/google";
 
 import { SubscriptionAlert } from "@/features/subscriptions/components/subscription-alert";
-
 import { auth } from "@/auth";
 import { Modals } from "@/components/modals";
 import { Toaster } from "@/components/ui/sonner";
@@ -11,12 +18,14 @@ import { Providers } from "@/components/providers";
 
 import "./globals.css";
 
-import {
-  Poppins,
-  Montserrat,
-  Playfair_Display,
-} from "next/font/google";
+/* =====================
+   Google Fonts (UI)
+===================== */
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -36,7 +45,23 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
 });
 
-const inter = Inter({ subsets: ["latin"] });
+const raleway = Raleway({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-raleway",
+});
+
+const bebas = Bebas_Neue({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-bebas",
+});
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-oswald",
+});
 
 export const metadata: Metadata = {
   title: "Gentlemen Designs",
@@ -45,9 +70,9 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   const session = await auth();
 
   return (
@@ -55,11 +80,14 @@ export default async function RootLayout({
       <html lang="en">
         <body
           className={`
-          ${inter.className}
-          ${poppins.variable}
-          ${montserrat.variable}
-          ${playfair.variable}
-        `}
+            ${inter.variable}
+            ${poppins.variable}
+            ${montserrat.variable}
+            ${playfair.variable}
+            ${raleway.variable}
+            ${bebas.variable}
+            ${oswald.variable}
+          `}
         >
           <Providers>
             <Toaster />
