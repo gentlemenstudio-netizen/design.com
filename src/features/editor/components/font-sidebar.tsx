@@ -1,10 +1,11 @@
-import { 
-  ActiveTool, 
+import {
+  ActiveTool,
   Editor,
-  fonts, 
+  fonts,
 } from "@/features/editor/types";
 import { ToolSidebarClose } from "@/features/editor/components/tool-sidebar-close";
 import { ToolSidebarHeader } from "@/features/editor/components/tool-sidebar-header";
+import { GOOGLE_FONTS } from "@/lib/fonts";
 
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -40,6 +41,26 @@ export const FontSidebar = ({
       />
       <ScrollArea>
         <div className="p-4 space-y-1 border-b">
+          {GOOGLE_FONTS.map((font) => (
+            <Button
+              key={font.family}
+              variant="secondary"
+              size="lg"
+              onClick={() => editor?.changeFontFamily(font.family)}
+              className={cn(
+                "w-full h-16 justify-start text-left",
+                value === font.family && "border-2 border-blue-500",
+              )}
+              style={{
+                fontFamily: font.family,
+                fontSize: "16px",
+                padding: "8px 16px"
+              }}
+            >
+              {font.label}
+            </Button>
+          ))}
+
           {fonts.map((font) => (
             <Button
               key={font}
@@ -59,6 +80,8 @@ export const FontSidebar = ({
               {font}
             </Button>
           ))}
+
+
         </div>
       </ScrollArea>
       <ToolSidebarClose onClick={onClose} />

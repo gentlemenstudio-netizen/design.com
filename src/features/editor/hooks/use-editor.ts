@@ -1,15 +1,15 @@
 import { fabric } from "fabric";
 import { useCallback, useState, useMemo, useRef } from "react";
-
-import { 
-  Editor, 
+import { loadCanvasFonts } from "@/lib/load-canvas-fonts";
+import {
+  Editor,
   FILL_COLOR,
   STROKE_WIDTH,
   STROKE_COLOR,
   CIRCLE_OPTIONS,
   DIAMOND_OPTIONS,
   TRIANGLE_OPTIONS,
-  BuildEditorProps, 
+  BuildEditorProps,
   RECTANGLE_OPTIONS,
   EditorHookProps,
   STROKE_DASH_ARRAY,
@@ -20,9 +20,9 @@ import {
   JSON_KEYS,
 } from "@/features/editor/types";
 import { useHistory } from "@/features/editor/hooks/use-history";
-import { 
-  createFilter, 
-  downloadFile, 
+import {
+  createFilter,
+  downloadFile,
   isTextType,
   transformText
 } from "@/features/editor/utils";
@@ -119,8 +119,8 @@ const buildEditor = ({
 
   const getWorkspace = () => {
     return canvas
-    .getObjects()
-    .find((object) => object.name === "clip");
+      .getObjects()
+      .find((object) => object.name === "clip");
   };
 
   const center = (object: fabric.Object) => {
@@ -386,7 +386,7 @@ const buildEditor = ({
       });
 
       canvas.renderAll();
-      
+
       const workspace = getWorkspace();
       workspace?.sendToBack();
     },
@@ -633,15 +633,15 @@ export const useEditor = ({
 
   useWindowEvents();
 
-  const { 
-    save, 
-    canRedo, 
-    canUndo, 
-    undo, 
+  const {
+    save,
+    canRedo,
+    canUndo,
+    undo,
     redo,
     canvasHistory,
     setHistoryIndex,
-  } = useHistory({ 
+  } = useHistory({
     canvas,
     saveCallback
   });
@@ -704,33 +704,36 @@ export const useEditor = ({
     }
 
     return undefined;
-  }, 
-  [
-    canRedo,
-    canUndo,
-    undo,
-    redo,
-    save,
-    autoZoom,
-    copy,
-    paste,
-    canvas,
-    fillColor,
-    strokeWidth,
-    strokeColor,
-    selectedObjects,
-    strokeDashArray,
-    fontFamily,
-  ]);
+  },
+    [
+      canRedo,
+      canUndo,
+      undo,
+      redo,
+      save,
+      autoZoom,
+      copy,
+      paste,
+      canvas,
+      fillColor,
+      strokeWidth,
+      strokeColor,
+      selectedObjects,
+      strokeDashArray,
+      fontFamily,
+    ]);
+
 
   const init = useCallback(
-    ({
+    async ({
       initialCanvas,
       initialContainer,
     }: {
       initialCanvas: fabric.Canvas;
       initialContainer: HTMLDivElement;
     }) => {
+      await loadCanvasFonts(); // 🔑 REQUIRED
+
       fabric.Object.prototype.set({
         cornerColor: "#FFF",
         cornerStyle: "circle",
