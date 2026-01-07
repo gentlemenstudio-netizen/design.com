@@ -2,6 +2,8 @@
 
 import { fabric } from "fabric";
 import { useEffect, useRef } from "react";
+import { loadCanvasFonts } from "@/lib/load-canvas-fonts";
+
 
 interface TemplatePreviewProps {
     json: any;
@@ -22,65 +24,72 @@ export const TemplatePreview = ({
 
     useEffect(() => {
         mountedRef.current = true;
-        if (!canvasRef.current) return;
 
-        const canvas = new fabric.Canvas(canvasRef.current, {
-            width,
-            height,
-            selection: false,
-            renderOnAddRemove: false,
-        });
+        const init = async () => {
+            if (!canvasRef.current) return;
 
-        fabricRef.current = canvas;
+            await loadCanvasFonts();
 
-        canvas.loadFromJSON(json, () => {
-            if (!mountedRef.current) return;
-
-            // 🔹 RESET viewport (critical)
-            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-
-            // 🔹 Compute bounds of all objects
-            const objects = canvas.getObjects();
-            if (!objects.length) return;
-
-            let minX = Infinity,
-                minY = Infinity,
-                maxX = -Infinity,
-                maxY = -Infinity;
-
-            objects.forEach((obj) => {
-                const rect = obj.getBoundingRect(true, true);
-                minX = Math.min(minX, rect.left);
-                minY = Math.min(minY, rect.top);
-                maxX = Math.max(maxX, rect.left + rect.width);
-                maxY = Math.max(maxY, rect.top + rect.height);
+            const canvas = new fabric.Canvas(canvasRef.current, {
+                width,
+                height,
+                selection: false,
+                renderOnAddRemove: false,
             });
 
-            const contentWidth = maxX - minX;
-            const contentHeight = maxY - minY;
+            fabricRef.current = canvas;
 
-            // 🔹 Scale to fit preview
-            const scale = Math.min(
-                width / contentWidth,
-                height / contentHeight
-            );
+            canvas.loadFromJSON(json, () => {
+                if (!mountedRef.current) return;
 
-            canvas.setZoom(scale);
+                // 🔹 RESET viewport (critical)
+                canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
 
-            // 🔹 Center content
-            canvas.absolutePan({
-                x: minX * scale - (width - contentWidth * scale) / 2,
-                y: minY * scale - (height - contentHeight * scale) / 2,
+                // 🔹 Compute bounds of all objects
+                const objects = canvas.getObjects();
+                if (!objects.length) return;
+
+                let minX = Infinity,
+                    minY = Infinity,
+                    maxX = -Infinity,
+                    maxY = -Infinity;
+
+                objects.forEach((obj) => {
+                    const rect = obj.getBoundingRect(true, true);
+                    minX = Math.min(minX, rect.left);
+                    minY = Math.min(minY, rect.top);
+                    maxX = Math.max(maxX, rect.left + rect.width);
+                    maxY = Math.max(maxY, rect.top + rect.height);
+                });
+
+                const contentWidth = maxX - minX;
+                const contentHeight = maxY - minY;
+
+                // 🔹 Scale to fit preview
+                const scale = Math.min(
+                    width / contentWidth,
+                    height / contentHeight
+                );
+
+                canvas.setZoom(scale);
+
+                // 🔹 Center content
+                canvas.absolutePan({
+                    x: minX * scale - (width - contentWidth * scale) / 2,
+                    y: minY * scale - (height - contentHeight * scale) / 2,
+                });
+
+                // 🔹 Disable interactions
+                objects.forEach((obj) => {
+                    obj.selectable = false;
+                    obj.evented = false;
+                });
+
+                canvas.renderAll();
             });
+        };
 
-            // 🔹 Disable interactions
-            objects.forEach((obj) => {
-                obj.selectable = false;
-                obj.evented = false;
-            });
-
-            canvas.renderAll();
-        });
+        init();
 
         return () => {
             mountedRef.current = false;
