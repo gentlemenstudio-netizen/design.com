@@ -2,18 +2,22 @@
 import WebFont from "webfontloader";
 import { GOOGLE_FONTS } from "./fonts";
 
-export function loadCanvasFonts(): Promise<void> {
-    return new Promise((resolve) => {
-        const families = GOOGLE_FONTS.flatMap((font) =>
-            font.weights.map((w) => `${font.family}:${w}`)
-        );
+let fontsPromise: Promise<void> | null = null;
 
-        WebFont.load({
-            google: {
-                families,
-            },
-            active: () => resolve(),
-            inactive: () => resolve(), // don't block editor
+export function loadCanvasFonts(): Promise<void> {
+    if (!fontsPromise) {
+        fontsPromise = new Promise((resolve) => {
+            WebFont.load({
+                google: {
+                    families: GOOGLE_FONTS.flatMap((f) =>
+                        f.weights.map((w) => `${f.family}:${w}`)
+                    ),
+                },
+                active: resolve,
+                inactive: resolve,
+            });
         });
-    });
+    }
+
+    return fontsPromise;
 }

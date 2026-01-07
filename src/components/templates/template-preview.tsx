@@ -1,9 +1,8 @@
 "use client";
 
 import { fabric } from "fabric";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { loadCanvasFonts } from "@/lib/load-canvas-fonts";
-
 
 interface TemplatePreviewProps {
     json: any;
@@ -20,104 +19,115 @@ export const TemplatePreview = ({
 }: TemplatePreviewProps) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const fabricRef = useRef<fabric.Canvas | null>(null);
-    const mountedRef = useRef(true);
+    const [ready, setReady] = useState(false);
 
+    /* =========================
+       INIT CANVAS (ONCE)
+    ========================= */
     useEffect(() => {
-        mountedRef.current = true;
+        let mounted = true;
 
         const init = async () => {
             if (!canvasRef.current) return;
 
             await loadCanvasFonts();
+            if (!mounted) return;
 
-            const canvas = new fabric.Canvas(canvasRef.current, {
+            fabricRef.current = new fabric.Canvas(canvasRef.current, {
                 width,
                 height,
                 selection: false,
                 renderOnAddRemove: false,
             });
 
-            fabricRef.current = canvas;
-
-            canvas.loadFromJSON(json, () => {
-                if (!mountedRef.current) return;
-
-                // 🔹 RESET viewport (critical)
-                canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-
-                // 🔹 Compute bounds of all objects
-                const objects = canvas.getObjects();
-                if (!objects.length) return;
-
-                let minX = Infinity,
-                    minY = Infinity,
-                    maxX = -Infinity,
-                    maxY = -Infinity;
-
-                objects.forEach((obj) => {
-                    const rect = obj.getBoundingRect(true, true);
-                    minX = Math.min(minX, rect.left);
-                    minY = Math.min(minY, rect.top);
-                    maxX = Math.max(maxX, rect.left + rect.width);
-                    maxY = Math.max(maxY, rect.top + rect.height);
-                });
-
-                const contentWidth = maxX - minX;
-                const contentHeight = maxY - minY;
-
-                // 🔹 Scale to fit preview
-                const scale = Math.min(
-                    width / contentWidth,
-                    height / contentHeight
-                );
-
-                canvas.setZoom(scale);
-
-                // 🔹 Center content
-                canvas.absolutePan({
-                    x: minX * scale - (width - contentWidth * scale) / 2,
-                    y: minY * scale - (height - contentHeight * scale) / 2,
-                });
-
-                // 🔹 Disable interactions
-                objects.forEach((obj) => {
-                    obj.selectable = false;
-                    obj.evented = false;
-                });
-
-                canvas.renderAll();
-            });
+            setReady(true);
         };
 
         init();
 
         return () => {
-            mountedRef.current = false;
+            mounted = false;
             fabricRef.current?.dispose();
             fabricRef.current = null;
         };
-    }, [json, width, height]);
+    }, [width, height]);
+
+    /* =========================
+       UPDATE JSON (NO RECREATE)
+    ========================= */
+    useEffect(() => {
+        const canvas = fabricRef.current;
+        if (!canvas || !ready) return;
+
+        canvas.loadFromJSON(json, () => {
+            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+
+            const objects = canvas.getObjects();
+            if (!objects.length) {
+                canvas.renderAll();
+                return;
+            }
+
+            // 🔹 Auto-fit content
+            let minX = Infinity,
+                minY = Infinity,
+                maxX = -Infinity,
+                maxY = -Infinity;
+
+            objects.forEach((obj) => {
+                const rect = obj.getBoundingRect(true, true);
+                minX = Math.min(minX, rect.left);
+                minY = Math.min(minY, rect.top);
+                maxX = Math.max(maxX, rect.left + rect.width);
+                maxY = Math.max(maxY, rect.top + rect.height);
+            });
+
+            const contentWidth = maxX - minX;
+            const contentHeight = maxY - minY;
+
+            const scale = Math.min(
+                width / contentWidth,
+                height / contentHeight
+            );
+
+            canvas.setZoom(scale);
+
+            canvas.absolutePan({
+                x: minX * scale - (width - contentWidth * scale) / 2,
+                y: minY * scale - (height - contentHeight * scale) / 2,
+            });
+
+            objects.forEach((obj) => {
+                obj.selectable = false;
+                obj.evented = false;
+            });
+
+            canvas.renderAll();
+        });
+    }, [json, ready, width, height]);
 
     return (
         <div
             onClick={onClick}
             className="
-    cursor-pointer
-    rounded-xl
-    border
-    bg-white
-    aspect-square
-    flex
-    items-center
-    justify-center
-    p-4
-    transition
-    hover:shadow-md
-    hover:border-primary
-  "
+        cursor-pointer
+        rounded-xl
+        border
+        bg-white
+        aspect-square
+        flex
+        items-center
+        justify-center
+        p-4
+        transition
+        hover:shadow-md
+        hover:border-primary
+      "
         >
-            <canvas ref={canvasRef} className="max-w-full max-h-full" />
+            {!ready && (
+                <div className="w-full h-full bg-muted animate-pulse rounded-lg" />
+            )}
+            <canvas ref={canvasRef} />
         </div>
-
     );
 };
