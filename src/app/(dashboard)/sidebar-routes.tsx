@@ -53,6 +53,7 @@ export const SidebarRoutes = () => {
         <SidebarItem href="/" icon={Home} label="Home" isActive={pathname === "/"} />
         <SidebarItem href="/logos" icon={Home} label="Logos" isActive={pathname === "/logos"} />
         <SidebarItem href="/business-cards" icon={Home} label="Business Cards" isActive={pathname === "/business-cards"} />
+        <SidebarItem href="/flyers" icon={Home} label="Flyers" isActive={pathname === "/flyers"} />
       </ul>
       <div className="px-3">
         <Separator />
