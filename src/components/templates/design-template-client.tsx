@@ -112,6 +112,16 @@ export const DesignTemplateClient = ({ templates }: Props) => {
                             key={template.id}
                             json={previewJson}
                             onClick={() => onUseTemplate(template)}
+                            onEdit={() => router.push(`/templates/edit/${template.id}`)}
+                            onDelete={async () => {
+                                if (!confirm("Delete this template?")) return;
+
+                                await fetch(`/api/templates/${template.id}`, {
+                                    method: "DELETE",
+                                });
+
+                                router.refresh();
+                            }}
                         />
                     );
                 })}

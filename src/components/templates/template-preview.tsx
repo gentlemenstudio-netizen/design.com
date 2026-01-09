@@ -9,6 +9,8 @@ interface TemplatePreviewProps {
     width?: number;
     height?: number;
     onClick?: () => void;
+    onEdit: () => void;
+    onDelete: () => void;
 }
 
 export const TemplatePreview = ({
@@ -16,6 +18,8 @@ export const TemplatePreview = ({
     width = 260,
     height = 260,
     onClick,
+    onEdit,
+    onDelete,
 }: TemplatePreviewProps) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const fabricRef = useRef<fabric.Canvas | null>(null);
@@ -107,9 +111,10 @@ export const TemplatePreview = ({
     }, [json, ready, width, height]);
 
     return (
-        <div
-            onClick={onClick}
-            className="
+        <div>
+            <div
+                onClick={onClick}
+                className="
         cursor-pointer
         rounded-xl
         border
@@ -123,11 +128,44 @@ export const TemplatePreview = ({
         hover:shadow-md
         hover:border-primary
       "
-        >
-            {!ready && (
-                <div className="w-full h-full bg-muted animate-pulse rounded-lg" />
-            )}
-            <canvas ref={canvasRef} />
+            >
+                {!ready && (
+                    <div className="w-full h-full bg-muted animate-pulse rounded-lg" />
+                )}
+                <canvas ref={canvasRef} />
+            </div>
+            <div
+                className="mt-2 flex items-center justify-between space-x-2"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    onClick={onEdit}
+                    className="
+          px-3 py-1
+          text-xs
+          rounded-md
+          bg-primary
+          text-white
+          hover:bg-primary/90
+        "
+                >
+                    Edit
+                </button>
+
+                <button
+                    onClick={onDelete}
+                    className="
+          px-3 py-1
+          text-xs
+          rounded-md
+          bg-destructive
+          text-white
+          hover:bg-destructive/90
+        "
+                >
+                    Delete
+                </button>
+            </div>
         </div>
     );
 };

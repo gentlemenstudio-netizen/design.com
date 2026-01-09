@@ -1,20 +1,20 @@
 import { useState } from "react";
 
-import { 
-  FaBold, 
-  FaItalic, 
-  FaStrikethrough, 
+import {
+  FaBold,
+  FaItalic,
+  FaStrikethrough,
   FaUnderline
 } from "react-icons/fa";
 import { TbColorFilter } from "react-icons/tb";
 import { BsBorderWidth } from "react-icons/bs";
 import { RxTransparencyGrid } from "react-icons/rx";
-import { 
-  ArrowUp, 
-  ArrowDown, 
-  ChevronDown, 
-  AlignLeft, 
-  AlignCenter, 
+import {
+  ArrowUp,
+  ArrowDown,
+  ChevronDown,
+  AlignLeft,
+  AlignCenter,
   AlignRight,
   Trash,
   SquareSplitHorizontal,
@@ -23,10 +23,10 @@ import {
 
 import { isTextType } from "@/features/editor/utils";
 import { FontSizeInput } from "@/features/editor/components/font-size-input";
-import { 
-  ActiveTool, 
-  Editor, 
-  FONT_SIZE, 
+import {
+  ActiveTool,
+  Editor,
+  FONT_SIZE,
   FONT_WEIGHT
 } from "@/features/editor/types";
 
@@ -350,12 +350,46 @@ export const Toolbar = ({
       )}
       {isText && (
         <div className="flex items-center h-full justify-center">
-         <FontSizeInput
+          <FontSizeInput
             value={properties.fontSize}
             onChange={onChangeFontSize}
-         />
+          />
         </div>
       )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="Change Case" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => editor?.changeTextCase()}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                activeTool === "effects" && "bg-gray-100"
+              )}
+            >
+              Aa
+            </Button>
+          </Hint>
+        </div>
+      )}
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <Hint label="Effects" side="bottom" sideOffset={5}>
+            <Button
+              onClick={() => onChangeActiveTool("effects")}
+              size="icon"
+              variant="ghost"
+              className={cn(
+                activeTool === "effects" && "bg-gray-100"
+              )}
+            >
+              Effects
+            </Button>
+          </Hint>
+        </div>
+      )}
+
+
       {isImage && (
         <div className="flex items-center h-full justify-center">
           <Hint label="Filters" side="bottom" sideOffset={5}>

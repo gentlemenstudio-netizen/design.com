@@ -7,44 +7,63 @@ import { transformText } from "@/features/editor/utils";
 
 interface Props {
     editor: any;
+    mode?: "project" | "template";
+    templateId?: string;
     onClose: () => void;
 }
 
 export const SaveTemplateModal = ({
     editor,
+    mode,
+    templateId,
     onClose,
 }: Props) => {
     const [name, setName] = useState("");
     const [category, setCategory] = useState("logo");
     const [loading, setLoading] = useState(false);
 
-
-
     const onSave = async () => {
+        if (!editor?.canvas) return;
+
         setLoading(true);
 
         const canvas = editor.canvas;
 
-        // 1️⃣ Export Fabric JSON correctly
+        // 1️⃣ Export Fabric JSON
         const dataUrl = canvas.toJSON(JSON_KEYS);
         await transformText(dataUrl.objects);
 
-        // 2️⃣ Build the template JSON (correct shape)
         const templateJson = {
-            width: canvas.getWidth(),
-            height: canvas.getHeight(),
             ...dataUrl,
         };
 
+        // 2️⃣ UPDATE TEMPLATE (edit mode)
+        if (mode === "template" && templateId) {
+            await fetch(`/api/templates/${templateId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    json: JSON.stringify(templateJson), // ✅ STRING (important)
+                    width: canvas.getWidth(),
+                    height: canvas.getHeight(),
+                }),
+            });
+
+            setLoading(false);
+            onClose();
+            return;
+        }
+
+        // 3️⃣ CREATE NEW TEMPLATE
         await fetch("/api/templates", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 name: name || "Template",
                 category,
-                json: templateJson,        // ✅ correct key
-                width: canvas.getWidth(),  // ✅ number
-                height: canvas.getHeight() // ✅ number
+                json: JSON.stringify(templateJson), // ✅ STRING
+                width: canvas.getWidth(),
+                height: canvas.getHeight(),
             }),
         });
 
@@ -55,24 +74,30 @@ export const SaveTemplateModal = ({
     return (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
             <div className="bg-white rounded-lg p-6 w-96 space-y-4">
-                <h2 className="text-lg font-semibold">Save as Template</h2>
+                <h2 className="text-lg font-semibold">
+                    {mode === "template" ? "Update Template" : "Save as Template"}
+                </h2>
 
-                <input
-                    className="w-full border px-3 py-2 rounded"
-                    placeholder="Template name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
+                {mode !== "template" && (
+                    <>
+                        <input
+                            className="w-full border px-3 py-2 rounded"
+                            placeholder="Template name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
 
-                <select
-                    className="w-full border px-3 py-2 rounded"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                >
-                    <option value="logo">Logo</option>
-                    <option value="business-card">Business Card</option>
-                    <option value="flyer">Flyer</option>
-                </select>
+                        <select
+                            className="w-full border px-3 py-2 rounded"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                        >
+                            <option value="logo">Logo</option>
+                            <option value="business-card">Business Card</option>
+                            <option value="flyer">Flyer</option>
+                        </select>
+                    </>
+                )}
 
                 <div className="flex justify-end gap-2">
                     <Button variant="secondary" onClick={onClose}>

@@ -31,13 +31,16 @@ import { TemplateSidebar } from "@/features/editor/components/template-sidebar";
 import { RemoveBgSidebar } from "@/features/editor/components/remove-bg-sidebar";
 import { SettingsSidebar } from "@/features/editor/components/settings-sidebar";
 import { SaveTemplateModal } from "@/components/templates/save-template-modal";
+import { EffectsSidebar } from "@/features/editor/components/effects-sidebar";
 
 interface EditorProps {
   initialData: ResponseType["data"];
+  mode?: "project" | "template";
 };
 
-export const Editor = ({ initialData }: EditorProps) => {
+export const Editor = ({ initialData, mode }: EditorProps) => {
   const { mutate } = useUpdateProject(initialData.id);
+
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSave = useCallback(
@@ -117,6 +120,8 @@ export const Editor = ({ initialData }: EditorProps) => {
       {saveTemplateOpen && editor && (
         <SaveTemplateModal
           editor={editor}
+          mode={mode}
+          templateId={initialData.id}
           onClose={() => setSaveTemplateOpen(false)}
         />
       )}
@@ -191,6 +196,11 @@ export const Editor = ({ initialData }: EditorProps) => {
           onChangeActiveTool={onChangeActiveTool}
         />
         <SettingsSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <EffectsSidebar
           editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}

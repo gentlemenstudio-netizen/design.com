@@ -9,6 +9,7 @@ import projects from "./projects";
 import subscriptions from "./subscriptions";
 
 import authConfig from "@/auth.config";
+import templates from "./templates";
 
 // Revert to "edge" if planning on running on the edge
 export const runtime = "nodejs";
@@ -29,6 +30,7 @@ const routes = app
   .route("/users", users)
   .route("/images", images)
   .route("/projects", projects)
+  .route("/templates", templates)
   .route("/subscriptions", subscriptions);
 
 export const GET = handle(app);

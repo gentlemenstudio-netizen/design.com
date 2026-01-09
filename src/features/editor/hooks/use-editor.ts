@@ -18,6 +18,7 @@ import {
   FONT_WEIGHT,
   FONT_SIZE,
   JSON_KEYS,
+  TextEffects,
 } from "@/features/editor/types";
 import { useHistory } from "@/features/editor/hooks/use-history";
 import {
@@ -138,6 +139,71 @@ const buildEditor = ({
     canvas.add(object);
     canvas.setActiveObject(object);
   };
+
+  const changeTextCase = () => {
+    const obj = canvas.getActiveObject();
+    if (!obj || obj.type !== "textbox") return;
+
+    const textObj = obj as fabric.Textbox;
+    const text = textObj.text || "";
+
+    let nextText = text;
+
+    if (text === text.toUpperCase()) {
+      // UPPER → lower
+      nextText = text.toLowerCase();
+    } else if (text === text.toLowerCase()) {
+      // lower → Title
+      nextText = text.replace(/\w\S*/g, (w) =>
+        w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+      );
+    } else {
+      // Title → UPPER
+      nextText = text.toUpperCase();
+    }
+
+    textObj.set("text", nextText);
+    canvas.requestRenderAll();
+  };
+
+  const updateTextEffects = (effects: TextEffects) => {
+    const obj = canvas.getActiveObject();
+    if (!obj || obj.type !== "textbox") return;
+
+    /* ===== OUTLINE ===== */
+    if (effects.outline) {
+      const { color, thickness } = effects.outline;
+
+      obj.set({
+        stroke: thickness > 0 ? color : undefined,
+        strokeWidth: thickness > 0 ? thickness : 0,
+        paintFirst: thickness > 0 ? "stroke" : "fill",
+      });
+    }
+
+    /* ===== SHADOW ===== */
+    if (effects.shadow) {
+      const { color, blur, offsetX, offsetY } = effects.shadow;
+
+      const hasShadow = blur > 0 || offsetX !== 0 || offsetY !== 0;
+
+      obj.set(
+        "shadow",
+        hasShadow
+          ? new fabric.Shadow({
+            color,
+            blur,
+            offsetX,
+            offsetY,
+          })
+          : undefined
+      );
+    }
+
+    canvas.requestRenderAll();
+  };
+
+
 
   return {
     savePng,
@@ -607,6 +673,8 @@ const buildEditor = ({
       return value;
     },
     selectedObjects,
+    changeTextCase,
+    updateTextEffects,
   };
 };
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db/drizzle";
 import { templates } from "@/db/schema";
 import { auth } from "@/auth";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
     const session = await auth();
@@ -23,3 +24,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
 }
+
+
+
+

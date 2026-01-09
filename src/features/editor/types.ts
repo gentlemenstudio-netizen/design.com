@@ -102,12 +102,14 @@ export type ActiveTool =
   | "stroke-color"
   | "stroke-width"
   | "font"
+  | "effects"
   | "opacity"
   | "filter"
   | "settings"
   | "ai"
   | "remove-bg"
-  | "templates";
+  | "templates"
+  ;
 
 export const FILL_COLOR = "rgba(0,0,0,1)";
 export const STROKE_COLOR = "rgba(0,0,0,1)";
@@ -203,6 +205,19 @@ export type BuildEditorProps = {
   setFontFamily: (value: string) => void;
 };
 
+export interface TextEffects {
+  outline?: {
+    color: string;
+    thickness: number;
+  };
+  shadow?: {
+    color: string;
+    blur: number;
+    offsetX: number;
+    offsetY: number;
+  };
+}
+
 export interface Editor {
   savePng: () => void;
   saveJpg: () => void;
@@ -261,4 +276,6 @@ export interface Editor {
   getActiveStrokeWidth: () => number;
   getActiveStrokeDashArray: () => number[];
   selectedObjects: fabric.Object[];
+  changeTextCase: () => void;
+  updateTextEffects: (effects: TextEffects) => void;
 };
