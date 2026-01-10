@@ -24,13 +24,14 @@ export const TemplatePreview = ({
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const fabricRef = useRef<fabric.Canvas | null>(null);
     const [ready, setReady] = useState(false);
+    const PREVIEW_WIDTH = 360;
+    const PREVIEW_HEIGHT = 290;
 
     /* =========================
        INIT CANVAS (ONCE)
     ========================= */
     useEffect(() => {
         let mounted = true;
-
         const init = async () => {
             if (!canvasRef.current) return;
 
@@ -38,8 +39,8 @@ export const TemplatePreview = ({
             if (!mounted) return;
 
             fabricRef.current = new fabric.Canvas(canvasRef.current, {
-                width,
-                height,
+                width: PREVIEW_WIDTH,
+                height: PREVIEW_HEIGHT,
                 selection: false,
                 renderOnAddRemove: false,
             });
@@ -63,76 +64,71 @@ export const TemplatePreview = ({
         const canvas = fabricRef.current;
         if (!canvas || !ready) return;
 
-        canvas.loadFromJSON(json, () => {
-            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        // Always reset canvas size for preview
+        canvas.setWidth(PREVIEW_WIDTH);
+        canvas.setHeight(PREVIEW_HEIGHT);
 
+        canvas.loadFromJSON(json, () => {
+            // 1️⃣ Grab loaded objects FIRST
             const objects = canvas.getObjects();
             if (!objects.length) {
                 canvas.renderAll();
                 return;
             }
 
-            // 🔹 Auto-fit content
-            let minX = Infinity,
-                minY = Infinity,
-                maxX = -Infinity,
-                maxY = -Infinity;
+            // 2️⃣ Remove them from canvas (do NOT clear)
+            objects.forEach(obj => canvas.remove(obj));
 
-            objects.forEach((obj) => {
-                const rect = obj.getBoundingRect(true, true);
-                minX = Math.min(minX, rect.left);
-                minY = Math.min(minY, rect.top);
-                maxX = Math.max(maxX, rect.left + rect.width);
-                maxY = Math.max(maxY, rect.top + rect.height);
+            // 3️⃣ Group objects
+            const group = new fabric.Group(objects, {
+                selectable: false,
+                evented: false,
             });
 
-            const contentWidth = maxX - minX;
-            const contentHeight = maxY - minY;
-
+            // 4️⃣ Scale to fit preview
             const scale = Math.min(
-                width / contentWidth,
-                height / contentHeight
-            );
+                PREVIEW_WIDTH / group.width!,
+                PREVIEW_HEIGHT / group.height!
+            ) * 0.9; // breathing space like Design.com
 
-            canvas.setZoom(scale);
+            group.scale(scale);
 
-            canvas.absolutePan({
-                x: minX * scale - (width - contentWidth * scale) / 2,
-                y: minY * scale - (height - contentHeight * scale) / 2,
+            // 5️⃣ Center perfectly
+            group.set({
+                left: PREVIEW_WIDTH / 2,
+                top: PREVIEW_HEIGHT / 2,
+                originX: "center",
+                originY: "center",
             });
 
-            objects.forEach((obj) => {
-                obj.selectable = false;
-                obj.evented = false;
-            });
+            // 6️⃣ Reset viewport (CRITICAL)
+            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
 
+            // 7️⃣ Add grouped preview
+            canvas.add(group);
             canvas.renderAll();
         });
-    }, [json, ready, width, height]);
+    }, [json, ready]);
 
     return (
         <div>
             <div
-                onClick={onClick}
+
                 className="
-        cursor-pointer
-        rounded-xl
-        border
-        bg-white
-        aspect-square
-        flex
-        items-center
-        justify-center
-        p-4
-        transition
-        hover:shadow-md
-        hover:border-primary
-      "
+      relative    
+    w-full
+    bg-white
+    border
+    rounded-xl
+    overflow-hidden
+      "  style={{ aspectRatio: "1.24 / 1" }}
             >
                 {!ready && (
                     <div className="w-full h-full bg-muted animate-pulse rounded-lg" />
                 )}
-                <canvas ref={canvasRef} />
+                <div className="absolute inset-0 flex items-center justify-center" onClick={onClick}>
+                    <canvas ref={canvasRef} />
+                </div>
             </div>
             <div
                 className="mt-2 flex items-center justify-between space-x-2"
