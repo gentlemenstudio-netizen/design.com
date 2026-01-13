@@ -39,6 +39,7 @@ export const IconColorSidebar = ({ editor, activeTool }: Props) => {
 
                         <PopoverContent side="right" align="center" className="p-2">
                             <ColorPicker
+                                key={color}
                                 color={color}
                                 onChange={(newColor) => {
                                     editor.replaceIconColor(color, newColor);
