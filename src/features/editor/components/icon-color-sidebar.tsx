@@ -32,6 +32,7 @@ export const IconColorSidebar = ({ editor, activeTool }: Props) => {
                     <Popover>
                         <PopoverTrigger asChild>
                             <button
+                                key={color}
                                 className="w-10 h-10 rounded-full border shadow-sm"
                                 style={{ backgroundColor: color }}
                             />
@@ -39,7 +40,6 @@ export const IconColorSidebar = ({ editor, activeTool }: Props) => {
 
                         <PopoverContent side="right" align="center" className="p-2">
                             <ColorPicker
-                                key={color}
                                 color={color}
                                 onChange={(newColor) => {
                                     editor.replaceIconColor(color, newColor);
