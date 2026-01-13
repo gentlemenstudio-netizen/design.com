@@ -32,6 +32,8 @@ import { RemoveBgSidebar } from "@/features/editor/components/remove-bg-sidebar"
 import { SettingsSidebar } from "@/features/editor/components/settings-sidebar";
 import { SaveTemplateModal } from "@/components/templates/save-template-modal";
 import { EffectsSidebar } from "@/features/editor/components/effects-sidebar";
+import { AdminSvgUploadButton } from "./svg-upload-button";
+import { IconColorSidebar } from "./icon-color-sidebar";
 
 interface EditorProps {
   initialData: ResponseType["data"];
@@ -125,6 +127,7 @@ export const Editor = ({ initialData, mode }: EditorProps) => {
           onClose={() => setSaveTemplateOpen(false)}
         />
       )}
+
       <div className="absolute h-[calc(100%-68px)] w-full top-[68px] flex">
         <Sidebar
           activeTool={activeTool}
@@ -201,6 +204,11 @@ export const Editor = ({ initialData, mode }: EditorProps) => {
           onChangeActiveTool={onChangeActiveTool}
         />
         <EffectsSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <IconColorSidebar
           editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}

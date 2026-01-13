@@ -28,6 +28,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AdminSvgUploadButton } from "./svg-upload-button";
 
 interface NavbarProps {
   id: string;
@@ -161,6 +162,12 @@ export const Navbar = ({
             Save as Template
           </Button>
         )}
+
+        <AdminSvgUploadButton
+          editor={editor!}
+          onClose={() => { }}
+        />
+
         <div className="ml-auto flex items-center gap-x-4">
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>

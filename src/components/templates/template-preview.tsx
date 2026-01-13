@@ -15,8 +15,8 @@ interface TemplatePreviewProps {
 
 export const TemplatePreview = ({
     json,
-    width = 260,
-    height = 260,
+    width = 360,
+    height = 290,
     onClick,
     onEdit,
     onDelete,
@@ -65,47 +65,53 @@ export const TemplatePreview = ({
         if (!canvas || !ready) return;
 
         // Always reset canvas size for preview
-        canvas.setWidth(PREVIEW_WIDTH);
-        canvas.setHeight(PREVIEW_HEIGHT);
+
 
         canvas.loadFromJSON(json, () => {
-            // 1️⃣ Grab loaded objects FIRST
+            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+            canvas.setWidth(PREVIEW_WIDTH);
+            canvas.setHeight(PREVIEW_HEIGHT);
             const objects = canvas.getObjects();
             if (!objects.length) {
                 canvas.renderAll();
                 return;
             }
 
-            // 2️⃣ Remove them from canvas (do NOT clear)
-            objects.forEach(obj => canvas.remove(obj));
+            // 🔹 Auto-fit content
+            let minX = Infinity,
+                minY = Infinity,
+                maxX = -Infinity,
+                maxY = -Infinity;
 
-            // 3️⃣ Group objects
-            const group = new fabric.Group(objects, {
-                selectable: false,
-                evented: false,
+            objects.forEach((obj) => {
+                const rect = obj.getBoundingRect(true, true);
+                minX = Math.min(minX, rect.left);
+                minY = Math.min(minY, rect.top);
+                maxX = Math.max(maxX, rect.left + rect.width);
+                maxY = Math.max(maxY, rect.top + rect.height);
             });
 
-            // 4️⃣ Scale to fit preview
+            const contentWidth = PREVIEW_WIDTH;
+            const contentHeight = PREVIEW_HEIGHT;
+
             const scale = Math.min(
-                PREVIEW_WIDTH / group.width!,
-                PREVIEW_HEIGHT / group.height!
-            ) * 0.9; // breathing space like Design.com
 
-            group.scale(scale);
+                1 * PREVIEW_WIDTH / (maxX - minX),
+                1 * PREVIEW_HEIGHT / (maxY - minY)
+            );
 
-            // 5️⃣ Center perfectly
-            group.set({
-                left: PREVIEW_WIDTH / 2,
-                top: PREVIEW_HEIGHT / 2,
-                originX: "center",
-                originY: "center",
+            canvas.setZoom(scale);
+
+            canvas.absolutePan({
+                x: minX * scale - (width - contentWidth * scale) / 2,
+                y: minY * scale - (height - contentHeight * scale) / 2,
             });
 
-            // 6️⃣ Reset viewport (CRITICAL)
-            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+            objects.forEach((obj) => {
+                obj.selectable = false;
+                obj.evented = false;
+            });
 
-            // 7️⃣ Add grouped preview
-            canvas.add(group);
             canvas.renderAll();
         });
     }, [json, ready]);

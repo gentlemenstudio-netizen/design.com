@@ -109,6 +109,7 @@ export type ActiveTool =
   | "ai"
   | "remove-bg"
   | "templates"
+  | "iconColor"
   ;
 
 export const FILL_COLOR = "rgba(0,0,0,1)";
@@ -278,4 +279,7 @@ export interface Editor {
   selectedObjects: fabric.Object[];
   changeTextCase: () => void;
   updateTextEffects: (effects: TextEffects) => void;
+  recolorLogoIcon: (color: string[]) => void;
+  getIconColors: () => string[];
+  replaceIconColor: (oldColor: string, newColor: string) => void;
 };

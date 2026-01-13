@@ -202,6 +202,83 @@ const buildEditor = ({
 
     canvas.requestRenderAll();
   };
+  const recolorLogoIcon = (colors: string[]) => {
+    const icon = canvas
+      .getObjects()
+      .find(o => o.customType === "logoIcon") as fabric.Group | undefined;
+
+    if (!icon) return;
+
+    icon.getObjects().forEach((obj: fabric.Object) => {
+      const index = obj.paletteIndex ?? 0;
+      obj.set("fill", colors[index % colors.length]);
+    });
+
+    canvas.requestRenderAll();
+  };
+
+  const normalizeColor = (color: string) => {
+    // convert rgba(0,0,0,1) → #000000 (simple fallback)
+    if (color.startsWith("rgb")) {
+      const nums = color.match(/\d+/g);
+      if (!nums) return color;
+      const [r, g, b] = nums.map(Number);
+      return (
+        "#" +
+        [r, g, b]
+          .map(x => x.toString(16).padStart(2, "0"))
+          .join("")
+      );
+    }
+    return color.toLowerCase();
+  };
+
+  const getIconColors = (): string[] => {
+    const active = canvas.getActiveObject();
+
+    if (!active || active.type !== "group") return [];
+
+    const group = active as fabric.Group;
+    const objects = getGroupObjects(group);
+
+    const colors = new Set<string>();
+
+    objects.forEach(obj => {
+      if (typeof obj.fill === "string") {
+        colors.add(normalizeColor(obj.fill));
+      }
+    });
+
+    return Array.from(colors);
+  };
+  const replaceIconColor = (oldColor: string, newColor: string) => {
+    const active = canvas.getActiveObject();
+
+    if (!active || active.type !== "group") return;
+
+    const group = active as fabric.Group;
+    const objects = getGroupObjects(group);
+
+    const normalizedOld = normalizeColor(oldColor);
+
+    objects.forEach(obj => {
+      if (
+        typeof obj.fill === "string" &&
+        normalizeColor(obj.fill) === normalizedOld
+      ) {
+        obj.set("fill", newColor);
+      }
+    });
+
+    canvas.requestRenderAll();
+  };
+
+
+  const getGroupObjects = (group: fabric.Group): fabric.Object[] => {
+    return typeof (group as any).getObjects === "function"
+      ? (group as any).getObjects()
+      : (group as any).objects || [];
+  };
 
 
 
@@ -672,9 +749,13 @@ const buildEditor = ({
 
       return value;
     },
+
     selectedObjects,
     changeTextCase,
     updateTextEffects,
+    recolorLogoIcon,
+    getIconColors,
+    replaceIconColor,
   };
 };
 

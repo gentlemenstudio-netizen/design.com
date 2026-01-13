@@ -1,6 +1,6 @@
 "use client";
 
-import { 
+import {
   LayoutTemplate,
   ImageIcon,
   Pencil,
@@ -42,6 +42,12 @@ export const Sidebar = ({
           label="Text"
           isActive={activeTool === "text"}
           onClick={() => onChangeActiveTool("text")}
+        />
+        <SidebarItem
+          icon={Settings}
+          label="iconColor"
+          isActive={activeTool === "iconColor"}
+          onClick={() => onChangeActiveTool("iconColor")}
         />
         <SidebarItem
           icon={Shapes}
