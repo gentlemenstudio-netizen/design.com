@@ -372,12 +372,16 @@ const buildEditor = ({
       canvas.discardActiveObject();
       canvas.renderAll();
     },
-    addText: (value, options) => {
+    addText: (value, options, role = "") => {
       const object = new fabric.Textbox(value, {
         ...TEXT_OPTIONS,
         fill: fillColor,
         ...options,
       });
+
+      if (role) {
+        object.customRole = role;
+      }
 
       addToCanvas(object);
     },

@@ -64,24 +64,50 @@ export const TemplatePreview = ({
         const canvas = fabricRef.current;
         if (!canvas || !ready) return;
 
-        // Always reset canvas size for preview
+        canvas.clear();
+        canvas.backgroundColor = "transparent";
+        canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        canvas.setZoom(1);
+        canvas.renderAll();
 
 
         canvas.loadFromJSON(json, () => {
-            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-            canvas.setWidth(PREVIEW_WIDTH);
-            canvas.setHeight(PREVIEW_HEIGHT);
-            const objects = canvas.getObjects();
+            if (!fabricRef.current) return;
+
+            const allObjects = canvas.getObjects();
+
+            canvas.getObjects().forEach((obj) => {
+                // Remove invisible background rectangles
+                if (
+                    obj.type === "rect" &&
+                    (obj.fill === "transparent" ||
+                        obj.fill === "rgba(0,0,0,0)" ||
+                        obj.opacity === 0)
+                ) {
+                    canvas.remove(obj);
+                }
+            });
+
+            // 🔑 ONLY logo-relevant objects
+            const objects = allObjects.filter((obj: any) => {
+                if (obj.customType === "logoIcon") return true;
+                if (obj.customRole === "brandName") return true;
+                if (obj.customRole === "tagline") return true;
+                return false;
+            });
+
+
+
             if (!objects.length) {
                 canvas.renderAll();
                 return;
             }
 
-            // 🔹 Auto-fit content
-            let minX = Infinity,
-                minY = Infinity,
-                maxX = -Infinity,
-                maxY = -Infinity;
+            // 🔹 Calculate bounding box
+            let minX = Infinity;
+            let minY = Infinity;
+            let maxX = -Infinity;
+            let maxY = -Infinity;
 
             objects.forEach((obj) => {
                 const rect = obj.getBoundingRect(true, true);
@@ -91,22 +117,29 @@ export const TemplatePreview = ({
                 maxY = Math.max(maxY, rect.top + rect.height);
             });
 
-            const contentWidth = PREVIEW_WIDTH;
-            const contentHeight = PREVIEW_HEIGHT;
+            const contentWidth = maxX - minX;
+            const contentHeight = maxY - minY;
 
+            if (contentWidth === 0 || contentHeight === 0) {
+                canvas.renderAll();
+                return;
+            }
+
+            // 🔹 Scale to preview card
             const scale = Math.min(
-
-                1 * PREVIEW_WIDTH / (maxX - minX),
-                1 * PREVIEW_HEIGHT / (maxY - minY)
-            );
+                PREVIEW_WIDTH / contentWidth,
+                PREVIEW_HEIGHT / contentHeight
+            ) * 0.9; // padding
 
             canvas.setZoom(scale);
 
+            // 🔹 Center content
             canvas.absolutePan({
-                x: minX * scale - (width - contentWidth * scale) / 2,
-                y: minY * scale - (height - contentHeight * scale) / 2,
+                x: minX * scale - (PREVIEW_WIDTH - contentWidth * scale) / 2,
+                y: minY * scale - (PREVIEW_HEIGHT - contentHeight * scale) / 2,
             });
 
+            // 🔹 Disable interaction
             objects.forEach((obj) => {
                 obj.selectable = false;
                 obj.evented = false;

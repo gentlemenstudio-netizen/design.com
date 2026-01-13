@@ -10,7 +10,11 @@ export const JSON_KEYS = [
   "linkData",
   "editable",
   "extensionType",
-  "extension"
+  "extension",
+  "customRole",
+  "customType",
+  "paletteIndex",
+  "isLogoIcon"
 ];
 
 export const filters = [
@@ -256,7 +260,7 @@ export interface Editor {
   getActiveFontWeight: () => number;
   getActiveFontFamily: () => string;
   changeFontFamily: (value: string) => void;
-  addText: (value: string, options?: ITextboxOptions) => void;
+  addText: (value: string, options?: ITextboxOptions, role?: string) => void;
   getActiveOpacity: () => number;
   changeOpacity: (value: number) => void;
   bringForward: () => void;

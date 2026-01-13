@@ -15,6 +15,10 @@ export function loadSvgIntoCanvas(
             originY: "center",
             selectable: true,
         });
+        group.set({
+            customType: "logoIcon",
+            selectable: true,
+        });
 
         // 🔑 Mark as logo icon
         group.customType = "logoIcon";

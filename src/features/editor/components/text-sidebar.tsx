@@ -1,6 +1,6 @@
-import { 
-  ActiveTool, 
-  Editor, 
+import {
+  ActiveTool,
+  Editor,
 } from "@/features/editor/types";
 import { ToolSidebarClose } from "@/features/editor/components/tool-sidebar-close";
 import { ToolSidebarHeader } from "@/features/editor/components/tool-sidebar-header";
@@ -78,6 +78,35 @@ export const TextSidebar = ({
             })}
           >
             Paragraph
+          </Button>
+
+          <Button
+            className="w-full h-16"
+            variant="secondary"
+            size="lg"
+            onClick={() => editor?.addText("{{BRAND_NAME}}", {
+              fontSize: 44,
+              fontWeight: 600,
+
+            }, "brand")}
+          >
+            <span className="text-xl font-semibold">
+              BRAND_NAME
+            </span>
+          </Button>
+
+          <Button
+            className="w-full h-16"
+            variant="secondary"
+            size="lg"
+            onClick={() => editor?.addText("{{TAGLINE}}", {
+              fontSize: 15,
+              fontWeight: 400,
+            }, "tagline")}
+          >
+            <span className="text-xl font-semibold">
+              TAGLINE
+            </span>
           </Button>
         </div>
       </ScrollArea>
