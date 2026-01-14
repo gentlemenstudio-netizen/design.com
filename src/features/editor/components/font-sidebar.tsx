@@ -10,6 +10,7 @@ import { GOOGLE_FONTS } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { FONT_FAMILY_OPTIONS } from "@/lib/brand-fonts";
 
 interface FontSidebarProps {
   editor: Editor | undefined;
@@ -41,7 +42,7 @@ export const FontSidebar = ({
       />
       <ScrollArea>
         <div className="p-4 space-y-1 border-b">
-          {GOOGLE_FONTS.map((font) => (
+          {FONT_FAMILY_OPTIONS.map((font) => (
             <Button
               key={font.family}
               variant="secondary"

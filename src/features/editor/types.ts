@@ -287,4 +287,17 @@ export interface Editor {
   recolorLogoIcon: (color: string[]) => void;
   getIconColors: () => string[];
   replaceIconColor: (oldColor: string, newColor: string) => void;
+  getIconGradients: () => {
+    signature: string;
+    stops: {
+      offset: number;
+      color: string;
+    }[];
+  }[];
+
+  updateIconGradientStop: (
+    signature: string,
+    stopIndex: number,
+    color: string
+  ) => void;
 };

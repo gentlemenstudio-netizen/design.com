@@ -14,10 +14,21 @@ interface Props {
 
 export const IconColorSidebar = ({ editor, activeTool }: Props) => {
     const [colors, setColors] = useState<string[]>([]);
+    const [gradients, setGradients] = useState<
+        {
+            signature: string;
+            stops: {
+                offset: number;
+                color: string;
+            }[];
+        }[]
+    >([]);
+
 
     useEffect(() => {
         if (!editor) return;
         setColors(editor.getIconColors());
+        setGradients(editor.getIconGradients());
     }, [editor]);
 
     if (activeTool !== "iconColor" || !editor) return null;
@@ -51,6 +62,35 @@ export const IconColorSidebar = ({ editor, activeTool }: Props) => {
                     </Popover>
 
                 ))}
+            </div>
+            {/* Gradient swatches */}
+            <h3 className="text-sm font-semibold">Icon Gradients</h3>
+
+            <div className="space-y-4">
+                {gradients.map((g, index) => (
+                    <div key={g.signature} className="space-y-2">
+                        <div className="text-xs text-muted-foreground">
+                            Gradient {index + 1}
+                        </div>
+
+                        <div className="flex gap-2">
+                            {g.stops.map((stop, stopIndex) => (
+                                <ColorPicker
+                                    key={`${g.signature}-${stopIndex}`}
+                                    color={stop.color}
+                                    onChange={(newColor) =>
+                                        editor.updateIconGradientStop(
+                                            g.signature,
+                                            stopIndex,
+                                            newColor
+                                        )
+                                    }
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+
             </div>
 
 

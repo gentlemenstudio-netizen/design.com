@@ -251,6 +251,89 @@ const buildEditor = ({
 
     return Array.from(colors);
   };
+
+  const getIconGradients = () => {
+    const group = getActiveLogoGroup();
+    if (!group) return [];
+
+    const gradientMap = new Map<
+      string,
+      {
+        signature: string;
+        paletteIndexes: number[]; // 🔑 all paths using this gradient
+        stops: { offset: number; color: string }[];
+        baseGradient: fabric.Gradient;
+      }
+    >();
+
+    group.getObjects().forEach((obj: any) => {
+      if (!obj.fill || typeof obj.fill === "string") return;
+
+      const gradient = obj.fill as fabric.Gradient;
+      if (!gradient.colorStops) return;
+
+      const sig = gradientSignature(gradient);
+
+      if (!gradientMap.has(sig)) {
+        gradientMap.set(sig, {
+          signature: sig,
+          paletteIndexes: [obj.paletteIndex],
+          stops: gradient.colorStops.map(s => ({
+            offset: s.offset,
+            color: s.color,
+          })),
+          baseGradient: gradient,
+        });
+      } else {
+        gradientMap.get(sig)!.paletteIndexes.push(obj.paletteIndex);
+      }
+    });
+
+    return Array.from(gradientMap.values());
+  };
+
+
+  const updateIconGradientStop = (
+    signature: string,
+    stopIndex: number,
+    color: string
+  ) => {
+    const group = getActiveLogoGroup();
+    if (!group) return;
+
+    group.getObjects().forEach((obj: any) => {
+      if (!obj.fill || typeof obj.fill === "string") return;
+
+      const gradient = obj.fill as fabric.Gradient;
+      if (!gradient.colorStops) return;
+
+      if (gradientSignature(gradient) !== signature) return;
+
+      const newStops = gradient.colorStops.map((stop, i) =>
+        i === stopIndex ? { ...stop, color } : stop
+      );
+
+      const newGradient = new fabric.Gradient({
+        type: gradient.type,
+        coords: gradient.coords,
+        colorStops: newStops,
+      });
+
+      obj.set("fill", newGradient);
+    });
+
+    canvas.requestRenderAll();
+  };
+
+
+
+
+  const getActiveLogoGroup = () => {
+    const active = canvas.getActiveObject();
+    if (!active || active.type !== "group") return null;
+    if ((active as any).customType !== "logoIcon") return null;
+    return active as fabric.Group;
+  };
   const replaceIconColor = (oldColor: string, newColor: string) => {
     const active = canvas.getActiveObject();
 
@@ -279,6 +362,18 @@ const buildEditor = ({
       ? (group as any).getObjects()
       : (group as any).objects || [];
   };
+
+  function gradientSignature(gradient: fabric.Gradient): string {
+    const stops = (gradient.colorStops ?? [])
+      .map(s => `${s.offset}:${s.color}`)
+      .join("|");
+
+    return JSON.stringify({
+      type: gradient.type,
+      coords: gradient.coords,
+      stops,
+    });
+  }
 
 
   return {
@@ -759,6 +854,8 @@ const buildEditor = ({
     recolorLogoIcon,
     getIconColors,
     replaceIconColor,
+    getIconGradients,
+    updateIconGradientStop,
   };
 };
 
