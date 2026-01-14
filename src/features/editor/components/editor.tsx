@@ -34,6 +34,8 @@ import { SaveTemplateModal } from "@/components/templates/save-template-modal";
 import { EffectsSidebar } from "@/features/editor/components/effects-sidebar";
 import { AdminSvgUploadButton } from "./svg-upload-button";
 import { IconColorSidebar } from "./icon-color-sidebar";
+import { BackgroundSidebar } from "./background-sidebar";
+
 
 interface EditorProps {
   initialData: ResponseType["data"];
@@ -209,6 +211,11 @@ export const Editor = ({ initialData, mode }: EditorProps) => {
           onChangeActiveTool={onChangeActiveTool}
         />
         <IconColorSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <BackgroundSidebar
           editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}

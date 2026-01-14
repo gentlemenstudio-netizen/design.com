@@ -50,6 +50,12 @@ export const Sidebar = ({
           onClick={() => onChangeActiveTool("iconColor")}
         />
         <SidebarItem
+          icon={Settings}
+          label="bgcolor"
+          isActive={activeTool === "bgcolor"}
+          onClick={() => onChangeActiveTool("bgcolor")}
+        />
+        <SidebarItem
           icon={Shapes}
           label="Shapes"
           isActive={activeTool === "shapes"}
@@ -73,6 +79,7 @@ export const Sidebar = ({
           isActive={activeTool === "settings"}
           onClick={() => onChangeActiveTool("settings")}
         />
+
       </ul>
     </aside>
   );

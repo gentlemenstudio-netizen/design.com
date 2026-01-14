@@ -28,11 +28,10 @@ export const IconColorSidebar = ({ editor, activeTool }: Props) => {
 
             {/* Color swatches */}
             <div className="flex flex-wrap gap-3">
-                {colors.map((color) => (
-                    <Popover>
+                {colors.map((color, index) => (
+                    <Popover key={`${color}-${index}`}>
                         <PopoverTrigger asChild>
                             <button
-                                key={color}
                                 className="w-10 h-10 rounded-full border shadow-sm"
                                 style={{ backgroundColor: color }}
                             />

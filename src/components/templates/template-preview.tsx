@@ -75,7 +75,7 @@ export const TemplatePreview = ({
             if (!fabricRef.current) return;
 
             const allObjects = canvas.getObjects();
-
+            //   applyBackground(canvas, template.background);
             canvas.getObjects().forEach((obj) => {
                 // Remove invisible background rectangles
                 if (

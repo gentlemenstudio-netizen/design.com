@@ -281,7 +281,6 @@ const buildEditor = ({
   };
 
 
-
   return {
     savePng,
     saveJpg,

@@ -114,6 +114,7 @@ export type ActiveTool =
   | "remove-bg"
   | "templates"
   | "iconColor"
+  | "bgcolor"
   ;
 
 export const FILL_COLOR = "rgba(0,0,0,1)";
