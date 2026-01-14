@@ -26,8 +26,10 @@ interface Props {
 
 export const BackgroundSidebar = ({ editor, activeTool }: Props) => {
 
-    if (activeTool !== "bgcolor" || !editor) return null;
     const [customColor, setCustomColor] = useState("#ff0055");
+
+    if (activeTool !== "bgcolor" || !editor) return null;
+
 
 
     const applyColor = (color: string) => {
