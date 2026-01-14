@@ -8,6 +8,8 @@ import {
   Shapes,
   Sparkles,
   Type,
+  Palette,
+  Paintbrush,
 } from "lucide-react";
 
 import { ActiveTool } from "@/features/editor/types";
@@ -44,14 +46,14 @@ export const Sidebar = ({
           onClick={() => onChangeActiveTool("text")}
         />
         <SidebarItem
-          icon={Settings}
-          label="iconColor"
+          icon={Palette}
+          label="Logo Color"
           isActive={activeTool === "iconColor"}
           onClick={() => onChangeActiveTool("iconColor")}
         />
         <SidebarItem
-          icon={Settings}
-          label="bgcolor"
+          icon={Paintbrush}
+          label="BG Color"
           isActive={activeTool === "bgcolor"}
           onClick={() => onChangeActiveTool("bgcolor")}
         />

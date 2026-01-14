@@ -87,7 +87,8 @@ export const TextSidebar = ({
             onClick={() => editor?.addText("{{BRAND_NAME}}", {
               fontSize: 44,
               fontWeight: 600,
-
+              textAlign: "center",
+              width: 290,
             }, "brand")}
           >
             <span className="text-xl font-semibold">
@@ -102,6 +103,8 @@ export const TextSidebar = ({
             onClick={() => editor?.addText("{{TAGLINE}}", {
               fontSize: 15,
               fontWeight: 400,
+              textAlign: "center",
+              width: 290,
             }, "tagline")}
           >
             <span className="text-xl font-semibold">
