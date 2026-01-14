@@ -17,9 +17,10 @@ interface DesignTemplate {
 
 interface Props {
     templates: DesignTemplate[];
+    type?: string;
 }
 
-export const DesignTemplateClient = ({ templates }: Props) => {
+export const DesignTemplateClient = ({ templates, type }: Props) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -40,10 +41,11 @@ export const DesignTemplateClient = ({ templates }: Props) => {
         setAppliedTagline(taglineInput);
 
         router.replace(
-            `/logos/templates?brand=${encodeURIComponent(
+            `/${type}/templates?brand=${encodeURIComponent(
                 brandInput
             )}&tagline=${encodeURIComponent(taglineInput)}`
         );
+        router.refresh();
     };
 
     const onUseTemplate = async (template: DesignTemplate) => {
@@ -67,6 +69,7 @@ export const DesignTemplateClient = ({ templates }: Props) => {
 
         const result = await res.json();
         router.push(`/editor/${result.data.id}`);
+
     };
 
     return (

@@ -11,7 +11,7 @@ export default async function FlyersTemplatesPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <DesignTemplateClient templates={data} />
+            <DesignTemplateClient templates={data} type="flyers" />
         </div>
     );
 }

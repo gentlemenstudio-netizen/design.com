@@ -13,7 +13,7 @@ export default async function BusinessCardsTemplatesPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <DesignTemplateClient templates={data} />
+            <DesignTemplateClient templates={data} type="business-card" />
         </div>
     );
 }

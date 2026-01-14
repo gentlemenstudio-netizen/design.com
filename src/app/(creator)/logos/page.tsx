@@ -19,16 +19,15 @@ export default function LogoHomePage() {
             />
 
             <button
-                onClick={() =>
-                    router.push(
-                        `/logos/templates?brand=${encodeURIComponent(brand)}`
-                    )
-                }
+                onClick={function () {
+                    router.push(`/logos/templates?brand=${encodeURIComponent(brand)}`)
+                    router.refresh();
+                }}
                 disabled={!brand.trim()}
                 className="bg-black text-white px-6 py-3 rounded disabled:opacity-50"
             >
                 Generate logos
             </button>
-        </div>
+        </div >
     );
 }

@@ -19,11 +19,10 @@ export default function BusinessCardsHomePage() {
             />
 
             <button
-                onClick={() =>
-                    router.push(
-                        `/business-cards/templates?brand=${encodeURIComponent(brand)}`
-                    )
-                }
+                onClick={function () {
+                    router.push(`/business-cards/templates?brand=${encodeURIComponent(brand)}`)
+                    router.refresh();
+                }}
                 disabled={!brand.trim()}
                 className="bg-black text-white px-6 py-3 rounded disabled:opacity-50"
             >
