@@ -4,6 +4,11 @@ import { fabric } from "fabric";
 import { useEffect, useRef, useState } from "react";
 import { loadCanvasFonts } from "@/lib/load-canvas-fonts";
 
+import { patchCanvasTextBaseline } from "@/lib/patch-canvas-textbaseline";
+
+patchCanvasTextBaseline();
+
+
 interface TemplatePreviewProps {
     json: any;
     onClick?: () => void;
@@ -23,6 +28,11 @@ export const TemplatePreview = ({
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const fabricRef = useRef<fabric.Canvas | null>(null);
     const [ready, setReady] = useState(false);
+    const hasReportedLoaded = useRef(false);
+    useEffect(() => {
+        hasReportedLoaded.current = false;
+    }, [json]);
+
 
     /* =========================
        INIT CANVAS (ONCE)
@@ -58,6 +68,7 @@ export const TemplatePreview = ({
        RESPONSIVE RENDER
     ========================= */
     useEffect(() => {
+
         const canvas = fabricRef.current;
         const container = containerRef.current;
         if (!canvas || !container || !ready) return;
@@ -71,7 +82,6 @@ export const TemplatePreview = ({
             canvas.clear();
             canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
             canvas.setZoom(1);
-
             canvas.loadFromJSON(json, () => {
                 const allObjects = canvas.getObjects();
 
@@ -122,7 +132,11 @@ export const TemplatePreview = ({
                 });
 
                 canvas.renderAll();
-                onLoaded?.();
+                if (!hasReportedLoaded.current) {
+                    hasReportedLoaded.current = true;
+                    onLoaded?.();
+                }
+
             });
         };
 

@@ -34,10 +34,10 @@ export const DesignTemplateClient = ({ templates, type, total, page }: Props) =>
     const initialBrand = searchParams.get("brand") || "";
     const initialTagline = searchParams.get("tagline") || "";
 
-    const [loadedCount, setLoadedCount] = useState(0);
+    const [loadedCount, setLoadedCount] = useState<Set<string>>(new Set());
 
     const totalPages = Math.ceil(total / PAGE_SIZE);
-    const isLoading = loadedCount < templates.length;
+    const isLoading = loadedCount.size < templates.length;
 
 
     // 🔹 Input state (editable)
@@ -50,7 +50,7 @@ export const DesignTemplateClient = ({ templates, type, total, page }: Props) =>
 
     /** 🔁 Reset loading when templates change (search / pagination) */
     useEffect(() => {
-        setLoadedCount(0);
+        setLoadedCount(() => new Set());
     }, [templates]);
 
 
@@ -153,9 +153,14 @@ export const DesignTemplateClient = ({ templates, type, total, page }: Props) =>
                             json={previewJson}
                             onClick={() => onUseTemplate(template)}
                             onEdit={() => router.push(`/templates/edit/${template.id}`)}
-                            onLoaded={() =>
-                                setLoadedCount((count) => count + 1)
-                            }
+                            onLoaded={() => {
+                                setLoadedCount((prev) => {
+                                    if (prev.has(template.id)) return prev; // 🔒 guard
+                                    const next = new Set(prev);
+                                    next.add(template.id);
+                                    return next;
+                                });
+                            }}
                             onDelete={async () => {
                                 if (!confirm("Delete this template?")) return;
 
