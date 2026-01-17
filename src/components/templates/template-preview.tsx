@@ -6,8 +6,6 @@ import { loadCanvasFonts } from "@/lib/load-canvas-fonts";
 
 interface TemplatePreviewProps {
     json: any;
-    width?: number;
-    height?: number;
     onClick?: () => void;
     onEdit: () => void;
     onDelete: () => void;
@@ -15,23 +13,21 @@ interface TemplatePreviewProps {
 
 export const TemplatePreview = ({
     json,
-    width = 360,
-    height = 290,
     onClick,
     onEdit,
     onDelete,
 }: TemplatePreviewProps) => {
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const fabricRef = useRef<fabric.Canvas | null>(null);
     const [ready, setReady] = useState(false);
-    const PREVIEW_WIDTH = 360;
-    const PREVIEW_HEIGHT = 290;
 
     /* =========================
        INIT CANVAS (ONCE)
     ========================= */
     useEffect(() => {
         let mounted = true;
+
         const init = async () => {
             if (!canvasRef.current) return;
 
@@ -39,8 +35,6 @@ export const TemplatePreview = ({
             if (!mounted) return;
 
             fabricRef.current = new fabric.Canvas(canvasRef.current, {
-                width: PREVIEW_WIDTH,
-                height: PREVIEW_HEIGHT,
                 selection: false,
                 renderOnAddRemove: false,
             });
@@ -55,148 +49,123 @@ export const TemplatePreview = ({
             fabricRef.current?.dispose();
             fabricRef.current = null;
         };
-    }, [width, height]);
+    }, []);
 
     /* =========================
-       UPDATE JSON (NO RECREATE)
+       RESPONSIVE RENDER
     ========================= */
     useEffect(() => {
         const canvas = fabricRef.current;
-        if (!canvas || !ready) return;
+        const container = containerRef.current;
+        if (!canvas || !container || !ready) return;
 
-        canvas.clear();
-        canvas.backgroundColor = "transparent";
-        canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-        canvas.setZoom(1);
-        canvas.renderAll();
+        const resizeAndRender = () => {
+            const { width, height } = container.getBoundingClientRect();
+            if (!width || !height) return;
 
+            canvas.setWidth(width);
+            canvas.setHeight(height);
+            canvas.clear();
+            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+            canvas.setZoom(1);
 
-        canvas.loadFromJSON(json, () => {
-            if (!fabricRef.current) return;
+            canvas.loadFromJSON(json, () => {
+                const allObjects = canvas.getObjects();
 
-            const allObjects = canvas.getObjects();
-            //   applyBackground(canvas, template.background);
-            canvas.getObjects().forEach((obj) => {
-                // Remove invisible background rectangles
-                if (
-                    obj.type === "rect" &&
-                    (obj.fill === "transparent" ||
-                        obj.fill === "rgba(0,0,0,0)" ||
-                        obj.opacity === 0)
-                ) {
-                    canvas.remove(obj);
+                // 🔑 Keep only logo-relevant objects
+                const objects = allObjects.filter((obj: any) => {
+                    return (
+                        obj.customType === "logoIcon" ||
+                        obj.customRole === "brandName" ||
+                        obj.customRole === "tagline"
+                    );
+                });
+
+                if (!objects.length) {
+                    canvas.renderAll();
+                    return;
                 }
-            });
 
-            // 🔑 ONLY logo-relevant objects
-            const objects = allObjects.filter((obj: any) => {
-                if (obj.customType === "logoIcon") return true;
-                if (obj.customRole === "brandName") return true;
-                if (obj.customRole === "tagline") return true;
-                return false;
-            });
+                // 🔹 Bounding box
+                let minX = Infinity,
+                    minY = Infinity,
+                    maxX = -Infinity,
+                    maxY = -Infinity;
 
+                objects.forEach((obj) => {
+                    const rect = obj.getBoundingRect(true, true);
+                    minX = Math.min(minX, rect.left);
+                    minY = Math.min(minY, rect.top);
+                    maxX = Math.max(maxX, rect.left + rect.width);
+                    maxY = Math.max(maxY, rect.top + rect.height);
+                });
 
+                const contentWidth = maxX - minX;
+                const contentHeight = maxY - minY;
 
-            if (!objects.length) {
+                if (!contentWidth || !contentHeight) return;
+
+                // 🔹 Scale to container
+                const scale = Math.min(
+                    width / contentWidth,
+                    height / contentHeight
+                ) * 0.9; // padding
+
+                canvas.setZoom(scale);
+
+                canvas.absolutePan({
+                    x: minX * scale - (width - contentWidth * scale) / 2,
+                    y: minY * scale - (height - contentHeight * scale) / 2,
+                });
+
+                objects.forEach((obj) => {
+                    obj.selectable = false;
+                    obj.evented = false;
+                });
+
                 canvas.renderAll();
-                return;
-            }
-
-            // 🔹 Calculate bounding box
-            let minX = Infinity;
-            let minY = Infinity;
-            let maxX = -Infinity;
-            let maxY = -Infinity;
-
-            objects.forEach((obj) => {
-                const rect = obj.getBoundingRect(true, true);
-                minX = Math.min(minX, rect.left);
-                minY = Math.min(minY, rect.top);
-                maxX = Math.max(maxX, rect.left + rect.width);
-                maxY = Math.max(maxY, rect.top + rect.height);
             });
+        };
 
-            const contentWidth = maxX - minX;
-            const contentHeight = maxY - minY;
+        resizeAndRender();
 
-            if (contentWidth === 0 || contentHeight === 0) {
-                canvas.renderAll();
-                return;
-            }
+        const observer = new ResizeObserver(resizeAndRender);
+        observer.observe(container);
 
-            // 🔹 Scale to preview card
-            const scale = Math.min(
-                PREVIEW_WIDTH / contentWidth,
-                PREVIEW_HEIGHT / contentHeight
-            ) * 0.9; // padding
-
-            canvas.setZoom(scale);
-
-            // 🔹 Center content
-            canvas.absolutePan({
-                x: minX * scale - (PREVIEW_WIDTH - contentWidth * scale) / 2,
-                y: minY * scale - (PREVIEW_HEIGHT - contentHeight * scale) / 2,
-            });
-
-            // 🔹 Disable interaction
-            objects.forEach((obj) => {
-                obj.selectable = false;
-                obj.evented = false;
-            });
-
-            canvas.renderAll();
-        });
+        return () => observer.disconnect();
     }, [json, ready]);
 
     return (
         <div>
             <div
-
+                ref={containerRef}
                 className="
-      relative    
-    w-full
-    bg-white
-    border
-    rounded-xl
-    overflow-hidden
-      "  style={{ aspectRatio: "1.24 / 1" }}
+          relative
+          w-full
+          bg-white
+          border
+          rounded-xl
+          overflow-hidden
+          aspect-[1.24/1]
+        "
+                onClick={onClick}
             >
                 {!ready && (
-                    <div className="w-full h-full bg-muted animate-pulse rounded-lg" />
+                    <div className="absolute inset-0 bg-muted animate-pulse" />
                 )}
-                <div className="absolute inset-0 flex items-center justify-center" onClick={onClick}>
-                    <canvas ref={canvasRef} />
-                </div>
+                <canvas ref={canvasRef} className="absolute inset-0" />
             </div>
-            <div
-                className="mt-2 flex items-center justify-between space-x-2"
-                onClick={(e) => e.stopPropagation()}
-            >
+
+            <div className="mt-2 flex items-center justify-between">
                 <button
                     onClick={onEdit}
-                    className="
-          px-3 py-1
-          text-xs
-          rounded-md
-          bg-primary
-          text-white
-          hover:bg-primary/90
-        "
+                    className="px-3 py-1 text-xs rounded-md bg-primary text-white"
                 >
                     Edit
                 </button>
-
                 <button
                     onClick={onDelete}
-                    className="
-          px-3 py-1
-          text-xs
-          rounded-md
-          bg-destructive
-          text-white
-          hover:bg-destructive/90
-        "
+                    className="px-3 py-1 text-xs rounded-md bg-destructive text-white"
                 >
                     Delete
                 </button>
