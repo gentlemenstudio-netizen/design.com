@@ -12,6 +12,20 @@ import {
     League_Spartan,
     Syne,
     Fraunces,
+    Work_Sans,
+    Baloo_Tamma_2,
+    Roboto,
+    Russo_One,
+    Coiny,
+    Gugi,
+    Creepster,
+    Sarpanch,
+    Outfit,
+    IBM_Plex_Sans,
+    Lora,
+    Fira_Sans,
+
+
 } from "next/font/google";
 
 /* =========================
@@ -95,6 +109,68 @@ export const frauncesFont = Fraunces({
     variable: "--font-fraunces",
 });
 
+export const workSansFont = Work_Sans({
+    subsets: ["latin"],
+    weight: ["400", "600", "700"],
+    variable: "--font-worksans",
+});
+export const balooTamma2Font = Baloo_Tamma_2({
+    subsets: ["latin"],
+    weight: ["400", "600", "700"],
+    variable: "--font-balootamma2",
+});
+export const robotoFont = Roboto({
+    subsets: ["latin"],
+    weight: ["400", "500", "700"],
+    variable: "--font-roboto",
+});
+export const russoOneFont = Russo_One({
+    subsets: ["latin"],
+    weight: ["400"],
+    variable: "--font-russoone",
+});
+export const coinyFont = Coiny({
+    subsets: ["latin"],
+    weight: ["400"],
+    variable: "--font-coiny",
+});
+export const gugiFont = Gugi({
+    subsets: ["latin"],
+    weight: ["400"],
+    variable: "--font-gugi",
+});
+export const creepsterFont = Creepster({
+    subsets: ["latin"],
+    weight: ["400"],
+    variable: "--font-creepster",
+});
+export const sarpanchFont = Sarpanch({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-sarpanch",
+});
+export const outfitFont = Outfit({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-outfit",
+});
+export const ibmPlexSansFont = IBM_Plex_Sans({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-ibmplexsans",
+});
+export const loraFont = Lora({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-lora",
+});
+export const firaSansFont = Fira_Sans({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-firasans",
+});
+
+
 /* =========================
    FONT REGISTRY (SAFE)
 ========================= */
@@ -113,6 +189,18 @@ export const BRAND_FONTS = [
     { key: "spartan", label: "League Spartan", font: leagueSpartanFont },
     { key: "syne", label: "Syne", font: syneFont },
     { key: "fraunces", label: "Fraunces", font: frauncesFont },
+    { key: "worksans", label: "Work Sans", font: workSansFont },
+    { key: "balootamma2", label: "Baloo Tamma 2", font: balooTamma2Font },
+    { key: "roboto", label: "Roboto", font: robotoFont },
+    { key: "russoone", label: "Russo One", font: russoOneFont },
+    { key: "coiny", label: "Coiny", font: coinyFont },
+    { key: "gugi", label: "Gugi", font: gugiFont },
+    { key: "creepster", label: "Creepster", font: creepsterFont },
+    { key: "sarpanch", label: "Sarpanch", font: sarpanchFont },
+    { key: "outfit", label: "Outfit", font: outfitFont },
+    { key: "ibmplexsans", label: "IBM Plex Sans", font: ibmPlexSansFont },
+    { key: "lora", label: "Lora", font: loraFont },
+    { key: "firasans", label: "Fira Sans", font: firaSansFont },
 ] as const;
 
 /* =========================
