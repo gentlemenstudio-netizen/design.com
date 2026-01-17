@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { injectTemplateVariables } from "@/lib/inject-template";
 import { TemplatePreview } from "@/components/templates/template-preview";
+import { cn } from "@/lib/utils";
 
 interface DesignTemplate {
     id: string;
@@ -18,15 +19,26 @@ interface DesignTemplate {
 interface Props {
     templates: DesignTemplate[];
     type?: string;
+    total: number;
+    page: number;
 }
 
-export const DesignTemplateClient = ({ templates, type }: Props) => {
+const PAGE_SIZE = 40;
+
+export const DesignTemplateClient = ({ templates, type, total, page }: Props) => {
     const router = useRouter();
     const searchParams = useSearchParams();
+
 
     // 🔹 Initial values from URL
     const initialBrand = searchParams.get("brand") || "";
     const initialTagline = searchParams.get("tagline") || "";
+
+    const [loadedCount, setLoadedCount] = useState(0);
+
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const isLoading = loadedCount < templates.length;
+
 
     // 🔹 Input state (editable)
     const [brandInput, setBrandInput] = useState(initialBrand);
@@ -36,16 +48,32 @@ export const DesignTemplateClient = ({ templates, type }: Props) => {
     const [appliedBrand, setAppliedBrand] = useState(initialBrand);
     const [appliedTagline, setAppliedTagline] = useState(initialTagline);
 
+    /** 🔁 Reset loading when templates change (search / pagination) */
+    useEffect(() => {
+        setLoadedCount(0);
+    }, [templates]);
+
+    console.log({ total });
+
+
     const onApply = () => {
         setAppliedBrand(brandInput);
         setAppliedTagline(taglineInput);
 
-        router.replace(
-            `/${type}/templates?brand=${encodeURIComponent(
-                brandInput
-            )}&tagline=${encodeURIComponent(taglineInput)}`
-        );
-        router.refresh();
+        const params = new URLSearchParams();
+        if (brandInput) params.set("brand", brandInput);
+        if (taglineInput) params.set("tagline", taglineInput);
+        params.set("page", "1");
+
+        router.push(`?${params.toString()}`);
+    };
+
+
+    /** 📄 Pagination handler */
+    const goToPage = (p: number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("page", String(p));
+        router.push(`?${params.toString()}`);
     };
 
     const onUseTemplate = async (template: DesignTemplate) => {
@@ -75,6 +103,15 @@ export const DesignTemplateClient = ({ templates, type }: Props) => {
     return (
         <div className="space-y-6">
             {/* 🔹 Header inputs */}
+
+            {/* 🔄 Global Loader */}
+            {isLoading && (
+                <div className="fixed inset-0 z-50 bg-white/70 flex items-center justify-center">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-black border-t-transparent" />
+                </div>
+            )}
+
+
             <div className="flex flex-wrap gap-4 items-end">
                 <div>
                     <label className="block text-sm mb-1">Brand name</label>
@@ -116,6 +153,9 @@ export const DesignTemplateClient = ({ templates, type }: Props) => {
                             json={previewJson}
                             onClick={() => onUseTemplate(template)}
                             onEdit={() => router.push(`/templates/edit/${template.id}`)}
+                            onLoaded={() =>
+                                setLoadedCount((count) => count + 1)
+                            }
                             onDelete={async () => {
                                 if (!confirm("Delete this template?")) return;
 
@@ -129,6 +169,29 @@ export const DesignTemplateClient = ({ templates, type }: Props) => {
                     );
                 })}
             </div>
+
+            {/* 📄 Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center gap-2 pt-6">
+                    {Array.from({ length: totalPages }).map((_, i) => {
+                        const p = i + 1;
+                        return (
+                            <button
+                                key={p}
+                                onClick={() => goToPage(p)}
+                                className={cn(
+                                    "px-3 py-1 rounded border",
+                                    p === page
+                                        ? "bg-black text-white"
+                                        : "hover:bg-gray-100"
+                                )}
+                            >
+                                {p}
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 };

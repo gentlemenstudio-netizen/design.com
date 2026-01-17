@@ -9,6 +9,7 @@ interface TemplatePreviewProps {
     onClick?: () => void;
     onEdit: () => void;
     onDelete: () => void;
+    onLoaded?: () => void;
 }
 
 export const TemplatePreview = ({
@@ -16,6 +17,7 @@ export const TemplatePreview = ({
     onClick,
     onEdit,
     onDelete,
+    onLoaded,
 }: TemplatePreviewProps) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -36,6 +38,7 @@ export const TemplatePreview = ({
 
             fabricRef.current = new fabric.Canvas(canvasRef.current, {
                 selection: false,
+                skipTargetFind: true,
                 renderOnAddRemove: false,
             });
 
@@ -118,16 +121,13 @@ export const TemplatePreview = ({
                     y: minY * scale - (height - contentHeight * scale) / 2,
                 });
 
-                objects.forEach((obj) => {
-                    obj.selectable = false;
-                    obj.evented = false;
-                });
-
                 canvas.renderAll();
+                onLoaded?.();
             });
         };
 
         resizeAndRender();
+
 
         const observer = new ResizeObserver(resizeAndRender);
         observer.observe(container);
