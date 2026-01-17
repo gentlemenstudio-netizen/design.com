@@ -21,11 +21,12 @@ interface Props {
     type?: string;
     total: number;
     page: number;
+    admin?: boolean;
 }
 
 const PAGE_SIZE = 40;
 
-export const DesignTemplateClient = ({ templates, type, total, page }: Props) => {
+export const DesignTemplateClient = ({ templates, type, total, page, admin }: Props) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -151,6 +152,7 @@ export const DesignTemplateClient = ({ templates, type, total, page }: Props) =>
                         <TemplatePreview
                             key={template.id}
                             json={previewJson}
+                            admin={admin}
                             onClick={() => onUseTemplate(template)}
                             onEdit={() => router.push(`/templates/edit/${template.id}`)}
                             onLoaded={() => {

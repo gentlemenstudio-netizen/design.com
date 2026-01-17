@@ -11,6 +11,7 @@ interface PageProps {
         brand?: string;
         tagline?: string;
         page?: string;
+        admin?: string;
     };
 }
 
@@ -20,6 +21,7 @@ export default async function LogoTemplatesPage({ searchParams }: PageProps) {
     const brand = searchParams.brand ?? "";
     const tagline = searchParams.tagline ?? "";
     const page = Number(searchParams.page ?? "1");
+    const admin = searchParams.admin === "true";
     const limit = 40;
     const offset = (page - 1) * limit;
 
@@ -37,7 +39,7 @@ export default async function LogoTemplatesPage({ searchParams }: PageProps) {
 
     return (
         <div className="p-6 space-y-6">
-            <DesignTemplateClient templates={data} type="logos" total={count} page={page} />
+            <DesignTemplateClient templates={data} type="logos" total={count} page={page} admin={admin} />
         </div>
     );
 }

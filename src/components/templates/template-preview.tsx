@@ -11,6 +11,7 @@ patchCanvasTextBaseline();
 
 interface TemplatePreviewProps {
     json: any;
+    admin?: boolean;
     onClick?: () => void;
     onEdit: () => void;
     onDelete: () => void;
@@ -19,6 +20,7 @@ interface TemplatePreviewProps {
 
 export const TemplatePreview = ({
     json,
+    admin = false,
     onClick,
     onEdit,
     onDelete,
@@ -170,20 +172,25 @@ export const TemplatePreview = ({
                 <canvas ref={canvasRef} className="absolute inset-0" />
             </div>
 
-            <div className="mt-2 flex items-center justify-between">
-                <button
-                    onClick={onEdit}
-                    className="px-3 py-1 text-xs rounded-md bg-primary text-white"
-                >
-                    Edit
-                </button>
-                <button
-                    onClick={onDelete}
-                    className="px-3 py-1 text-xs rounded-md bg-destructive text-white"
-                >
-                    Delete
-                </button>
-            </div>
+            {admin && (
+                <div className="mt-2 flex items-center justify-between">
+                    <button
+                        onClick={onEdit}
+                        className="px-3 py-1 text-xs rounded-md bg-primary text-white"
+                    >
+                        Edit
+                    </button>
+                    <button
+                        onClick={onDelete}
+                        className="px-3 py-1 text-xs rounded-md bg-destructive text-white"
+                    >
+                        Delete
+                    </button>
+                </div>
+
+            )}
+
+
         </div>
     );
 };
