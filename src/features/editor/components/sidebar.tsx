@@ -52,6 +52,12 @@ export const Sidebar = ({
           onClick={() => onChangeActiveTool("iconColor")}
         />
         <SidebarItem
+          icon={Palette}
+          label="Layout"
+          isActive={activeTool === "layout"}
+          onClick={() => onChangeActiveTool("layout")}
+        />
+        <SidebarItem
           icon={Paintbrush}
           label="BG Color"
           isActive={activeTool === "bgcolor"}

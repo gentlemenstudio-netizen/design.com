@@ -1,6 +1,7 @@
 import { fabric } from "fabric";
 import { ITextboxOptions } from "fabric/fabric-impl";
 import * as material from "material-colors";
+import { LogoLayoutId } from "./layouts/logo-layouts";
 
 export const JSON_KEYS = [
   "name",
@@ -115,6 +116,7 @@ export type ActiveTool =
   | "templates"
   | "iconColor"
   | "bgcolor"
+  | "layout"
   ;
 
 export const FILL_COLOR = "rgba(0,0,0,1)";
@@ -300,4 +302,5 @@ export interface Editor {
     stopIndex: number,
     color: string
   ) => void;
+  applyLogoLayout: (layout: LogoLayoutId) => void;
 };

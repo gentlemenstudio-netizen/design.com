@@ -35,6 +35,8 @@ import { EffectsSidebar } from "@/features/editor/components/effects-sidebar";
 import { AdminSvgUploadButton } from "./svg-upload-button";
 import { IconColorSidebar } from "./icon-color-sidebar";
 import { BackgroundSidebar } from "./background-sidebar";
+import { Layout } from "lucide-react";
+import { LayoutSidebar } from "./layout-sidebar";
 
 
 interface EditorProps {
@@ -211,6 +213,11 @@ export const Editor = ({ initialData, mode }: EditorProps) => {
           onChangeActiveTool={onChangeActiveTool}
         />
         <IconColorSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <LayoutSidebar
           editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}

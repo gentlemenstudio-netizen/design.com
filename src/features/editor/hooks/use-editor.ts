@@ -33,6 +33,7 @@ import { useAutoResize } from "@/features/editor/hooks/use-auto-resize";
 import { useCanvasEvents } from "@/features/editor/hooks/use-canvas-events";
 import { useWindowEvents } from "@/features/editor/hooks/use-window-events";
 import { useLoadState } from "@/features/editor/hooks/use-load-state";
+import { LogoLayoutId } from "../layouts/logo-layouts";
 
 const buildEditor = ({
   save,
@@ -374,6 +375,79 @@ const buildEditor = ({
       stops,
     });
   }
+
+  const applyLogoLayout = (layout: LogoLayoutId) => {
+    if (!canvas) return;
+
+    const objects = canvas.getObjects();
+
+    const icon = objects.find(
+      (o: any) => o.customType === "logoIcon"
+    );
+
+    const brand = objects.find(
+      (o: any) => o.customRole === "brandName"
+    );
+
+    const tagline = objects.find(
+      (o: any) => o.customRole === "tagline"
+    );
+
+    if (!icon && !brand) return;
+
+    const cx = canvas.getWidth()! / 2;
+    const cy = canvas.getHeight()! / 2;
+    const gap = 24;
+
+    // Reset visibility
+    [icon, brand, tagline].forEach((o) => o && o.set({ visible: true }));
+
+    switch (layout) {
+      case "icon-top":
+        icon?.set({ left: cx, top: cy - 60 });
+        brand?.set({ left: cx, top: cy + gap });
+        tagline?.set({ left: cx, top: cy + gap * 2 });
+        break;
+
+      case "icon-bottom":
+        brand?.set({ left: cx, top: cy - gap });
+        tagline?.set({ left: cx, top: cy });
+        icon?.set({ left: cx, top: cy + 60 });
+        break;
+
+      case "icon-left":
+        icon?.set({ left: cx - 80, top: cy });
+        brand?.set({ left: cx + gap, top: cy - 10 });
+        tagline?.set({ left: cx + gap, top: cy + 15 });
+        break;
+
+      case "icon-right":
+        icon?.set({ left: cx + 80, top: cy });
+        brand?.set({ left: cx - gap, top: cy - 10 });
+        tagline?.set({ left: cx - gap, top: cy + 15 });
+        break;
+
+      case "icon-only":
+        icon?.set({ left: cx, top: cy });
+        brand?.set({ visible: false });
+        tagline?.set({ visible: false });
+        break;
+
+      case "text-only":
+        icon?.set({ visible: false });
+        brand?.set({ left: cx, top: cy - 10 });
+        tagline?.set({ left: cx, top: cy + 15 });
+        break;
+    }
+
+    // Normalize origins
+    [icon, brand, tagline].forEach((o) =>
+      o?.set({ originX: "center", originY: "center" })
+    );
+
+    canvas.requestRenderAll();
+  }
+
 
 
   return {
@@ -856,6 +930,7 @@ const buildEditor = ({
     replaceIconColor,
     getIconGradients,
     updateIconGradientStop,
+    applyLogoLayout,
   };
 };
 
