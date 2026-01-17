@@ -53,7 +53,7 @@ export const DesignTemplateClient = ({ templates, type, total, page }: Props) =>
         setLoadedCount(0);
     }, [templates]);
 
-    console.log({ total });
+
 
 
     const onApply = () => {
