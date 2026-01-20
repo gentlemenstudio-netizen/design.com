@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 import { ITextboxOptions } from "fabric/fabric-impl";
 import * as material from "material-colors";
-import { LogoLayoutId } from "./layouts/logo-layouts";
+import { LogoLayoutId } from "../editor/layout/logo-layout.types";
 
 export const JSON_KEYS = [
   "name",
