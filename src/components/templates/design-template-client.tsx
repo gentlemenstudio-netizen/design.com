@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { injectTemplateVariables } from "@/lib/inject-template";
@@ -29,6 +29,8 @@ const PAGE_SIZE = 40;
 export const DesignTemplateClient = ({ templates, type, total, page, admin }: Props) => {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const brandRef = useRef<HTMLInputElement>(null);
+    const taglineRef = useRef<HTMLInputElement>(null);
 
 
     // 🔹 Initial values from URL
@@ -39,6 +41,7 @@ export const DesignTemplateClient = ({ templates, type, total, page, admin }: Pr
 
     const totalPages = Math.ceil(total / PAGE_SIZE);
     const isLoading = loadedCount.size < templates.length;
+    const [manualLoading, setManualLoading] = useState(false);
 
 
     // 🔹 Input state (editable)
@@ -64,16 +67,18 @@ export const DesignTemplateClient = ({ templates, type, total, page, admin }: Pr
 
 
     const onApply = () => {
-        //   setAppliedBrand(brandInput);
-        //setAppliedTagline(taglineInput);
-
+        setManualLoading(true);
+        const brandName = brandRef.current?.value || "";
+        const tagLine = taglineRef.current?.value || "";
         const params = new URLSearchParams();
-        if (brandInput) params.set("brand", brandInput);
-        if (taglineInput) params.set("tagline", taglineInput);
+        if (brandInput) params.set("brand", brandName);
+        if (taglineInput) params.set("tagline", tagLine);
         params.set("page", "1");
+
 
         router.push(`/logos/templates?${params.toString()}`);
         router.refresh();
+        setManualLoading(false);
     };
 
 
@@ -113,7 +118,7 @@ export const DesignTemplateClient = ({ templates, type, total, page, admin }: Pr
             {/* 🔹 Header inputs */}
 
             {/* 🔄 Global Loader */}
-            {isLoading && (
+            {(isLoading || manualLoading) && (
                 <div className="fixed inset-0 z-50 bg-white/70 flex items-center justify-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-black border-t-transparent" />
                 </div>
@@ -124,8 +129,8 @@ export const DesignTemplateClient = ({ templates, type, total, page, admin }: Pr
                 <div>
                     <label className="block text-sm mb-1">Brand name</label>
                     <input
-                        value={brandInput}
-                        onChange={(e) => setBrandInput(e.target.value)}
+                        ref={brandRef}
+                        defaultValue={brandInput}
                         className="border rounded px-3 py-2 w-64"
                     />
                 </div>
@@ -133,8 +138,8 @@ export const DesignTemplateClient = ({ templates, type, total, page, admin }: Pr
                 <div>
                     <label className="block text-sm mb-1">Tagline</label>
                     <input
-                        value={taglineInput}
-                        onChange={(e) => setTaglineInput(e.target.value)}
+                        ref={taglineRef}
+                        defaultValue={taglineInput}
                         className="border rounded px-3 py-2 w-64"
                     />
                 </div>
