@@ -33,7 +33,8 @@ import { useAutoResize } from "@/features/editor/hooks/use-auto-resize";
 import { useCanvasEvents } from "@/features/editor/hooks/use-canvas-events";
 import { useWindowEvents } from "@/features/editor/hooks/use-window-events";
 import { useLoadState } from "@/features/editor/hooks/use-load-state";
-import { LogoLayoutId } from "../layouts/logo-layouts";
+import { LOGO_LAYOUT_RECIPES } from "../layout/logo-layout.recipes";
+import { LogoLayoutId } from "../layout/logo-layout.types";
 
 const buildEditor = ({
   save,
@@ -376,78 +377,193 @@ const buildEditor = ({
     });
   }
 
+
+
   const applyLogoLayout = (layout: LogoLayoutId) => {
     if (!canvas) return;
 
-    const objects = canvas.getObjects();
+    const recipe = LOGO_LAYOUT_RECIPES[layout];
+    if (!recipe) return;
 
-    const icon = objects.find(
+    const icon = canvas.getObjects().find(
       (o: any) => o.customType === "logoIcon"
     );
-
-    const brand = objects.find(
-      (o: any) => o.customRole === "brandName"
+    const brand = canvas.getObjects().find(
+      (o: any) => o.customRole === "brand"
     );
-
-    const tagline = objects.find(
+    const tagline = canvas.getObjects().find(
       (o: any) => o.customRole === "tagline"
     );
 
-    if (!icon && !brand) return;
+    const elements = [icon, brand, tagline].filter(Boolean) as fabric.Object[];
+    if (!elements.length) return;
 
-    const cx = canvas.getWidth()! / 2;
-    const cy = canvas.getHeight()! / 2;
-    const gap = 24;
+    const artboard = getArtboard(canvas);
+    if (!artboard) return;
 
-    // Reset visibility
-    [icon, brand, tagline].forEach((o) => o && o.set({ visible: true }));
 
-    switch (layout) {
-      case "icon-top":
-        icon?.set({ left: cx, top: cy - 60 });
-        brand?.set({ left: cx, top: cy + gap });
-        tagline?.set({ left: cx, top: cy + gap * 2 });
-        break;
+    // reset base scale once
+    elements.forEach((o: any) => {
+      if (!o.__baseScaleX) {
+        o.__baseScaleX = o.scaleX ?? 1;
+        o.__baseScaleY = o.scaleY ?? 1;
+      }
+      if (o.customType === "logoIcon") {
+        o.scaleX = o.__baseScaleX * recipe.iconScale;
+        o.scaleY = o.__baseScaleY * recipe.iconScale;
+      }
+      if (o.customRole === "brand" || o.customRole === "tagline") {
+        o.scaleX = o.__baseScaleX * recipe.textScale;
+        o.scaleY = o.__baseScaleY * recipe.textScale;
+        o.set('fontSize', (o.__baseFontSize || FONT_SIZE) * recipe.textScale);
 
-      case "icon-bottom":
-        brand?.set({ left: cx, top: cy - gap });
-        tagline?.set({ left: cx, top: cy });
-        icon?.set({ left: cx, top: cy + 60 });
-        break;
+      }
+    });
 
-      case "icon-left":
-        icon?.set({ left: cx - 80, top: cy });
-        brand?.set({ left: cx + gap, top: cy - 10 });
-        tagline?.set({ left: cx + gap, top: cy + 15 });
-        break;
+    const { cx, cy } = artboard;
 
-      case "icon-right":
-        icon?.set({ left: cx + 80, top: cy });
-        brand?.set({ left: cx - gap, top: cy - 10 });
-        tagline?.set({ left: cx - gap, top: cy + 15 });
-        break;
 
-      case "icon-only":
-        icon?.set({ left: cx, top: cy });
-        brand?.set({ visible: false });
-        tagline?.set({ visible: false });
-        break;
+    icon?.set({ visible: recipe.iconScale > 0 });
+    brand?.set({ visible: recipe.textScale > 0 });
+    tagline?.set({ visible: recipe.textScale > 0 });
 
-      case "text-only":
-        icon?.set({ visible: false });
-        brand?.set({ left: cx, top: cy - 10 });
-        tagline?.set({ left: cx, top: cy + 15 });
-        break;
+
+
+    if (recipe.direction === "vertical") {
+      icon?.set({ left: cx, top: cy - 60 });
+      brand?.set({ left: cx, top: cy + recipe.spacing });
+      tagline?.set({ left: cx, top: cy + recipe.spacing * 2 });
+    } else {
+      const dir = recipe.iconPosition === "end" ? 1 : -1;
+      icon?.set({ left: cx + dir * 120, top: cy });
+      brand?.set({ left: cx - dir * 20, top: cy - 10 });
+      tagline?.set({ left: cx - dir * 20, top: cy + 16 });
     }
 
-    // Normalize origins
-    [icon, brand, tagline].forEach((o) =>
-      o?.set({ originX: "center", originY: "center" })
+
+
+    elements.forEach((o) =>
+      o.set({ originX: "center", originY: "center" })
     );
 
+    fitLogoToArtboard(canvas, elements);
+    centerLogo(canvas, elements);
     canvas.requestRenderAll();
+  };
+
+  function centerLogo(canvas: fabric.Canvas, objects: fabric.Object[]) {
+    const artboard = canvas.getObjects().find(
+      (o: any) => o.type === "rect" && o.name === "clip"
+    );
+    if (!artboard) return;
+
+    const art = artboard.getBoundingRect(true, true);
+    const bounds = getCombinedBounds(objects);
+
+    const offsetX =
+      art.left + art.width / 2 - (bounds.minX + bounds.width / 2);
+    const offsetY =
+      art.top + art.height / 2 - (bounds.minY + bounds.height / 2);
+
+    objects.forEach((obj) => {
+      obj.left! += offsetX;
+      obj.top! += offsetY;
+      obj.setCoords();
+    });
   }
 
+  function getCombinedBounds(objects: fabric.Object[]) {
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+
+    objects.forEach((obj) => {
+      obj.setCoords();
+      const rect = obj.getBoundingRect(true, true);
+
+      minX = Math.min(minX, rect.left);
+      minY = Math.min(minY, rect.top);
+      maxX = Math.max(maxX, rect.left + rect.width);
+      maxY = Math.max(maxY, rect.top + rect.height);
+    });
+
+    return {
+      width: maxX - minX,
+      height: maxY - minY,
+      minX,
+      minY,
+    };
+  }
+
+
+
+  function resetObject(o?: fabric.Object) {
+    if (!o) return;
+    o.set({
+      originX: "center",
+      originY: "center",
+      angle: 0,
+    });
+    o.setCoords();
+  }
+
+  function getLogoParts(canvas: fabric.Canvas) {
+    const icon = canvas.getObjects().find(o => o.customType === "logoIcon");
+    const brand = canvas.getObjects().find(o => o.customRole === "brand");
+    const tagline = canvas.getObjects().find(o => o.customRole === "tagline");
+
+    return { icon, brand, tagline };
+  }
+
+
+
+  function fitLogoToArtboard(
+    canvas: fabric.Canvas,
+    objects: fabric.Object[],
+    padding = 40
+  ) {
+    const artboard = canvas.getObjects().find(
+      (o: any) => o.type === "rect" && o.name === "clip"
+    );
+
+    if (!artboard) return;
+
+    const art = artboard.getBoundingRect(true, true);
+    const bounds = getCombinedBounds(objects);
+
+    const scale = Math.min(
+      (art.width - padding * 2) / bounds.width,
+      (art.height - padding * 2) / bounds.height,
+      1 // ⛔ never upscale too much
+    );
+
+    objects.forEach((obj) => {
+      obj.scaleX = (obj.scaleX ?? 1) * scale;
+      obj.scaleY = (obj.scaleY ?? 1) * scale;
+      obj.setCoords();
+    });
+  }
+
+
+
+
+  function getArtboard(canvas: fabric.Canvas) {
+    const bg = canvas.getObjects().find(
+      (o: any) => o.type === "rect" && o.name === "clip"
+    );
+
+    if (!bg) return null;
+
+    const rect = bg.getBoundingRect(true, true);
+
+    return {
+      cx: rect.left + rect.width / 2,
+      cy: rect.top + rect.height / 2,
+      width: rect.width,
+      height: rect.height,
+    };
+  }
 
 
   return {

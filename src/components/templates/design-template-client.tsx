@@ -54,19 +54,26 @@ export const DesignTemplateClient = ({ templates, type, total, page, admin }: Pr
         setLoadedCount(() => new Set());
     }, [templates]);
 
+    useEffect(() => {
+        const brand = searchParams.get("brand") || "";
+        const tagline = searchParams.get("tagline") || "";
 
+        setAppliedBrand(brand);
+        setAppliedTagline(tagline);
+    }, [searchParams]);
 
 
     const onApply = () => {
-        setAppliedBrand(brandInput);
-        setAppliedTagline(taglineInput);
+        //   setAppliedBrand(brandInput);
+        //setAppliedTagline(taglineInput);
 
         const params = new URLSearchParams();
         if (brandInput) params.set("brand", brandInput);
         if (taglineInput) params.set("tagline", taglineInput);
         params.set("page", "1");
 
-        router.push(`?${params.toString()}`);
+        router.push(`/logos/templates?${params.toString()}`);
+        router.refresh();
     };
 
 
