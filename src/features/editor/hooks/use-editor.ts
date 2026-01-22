@@ -601,6 +601,30 @@ const buildEditor = ({
       autoZoom();
       save();
     },
+    chnageTextSpacing: (spacing: number) => {
+      const obj = canvas.getActiveObject();
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          // @ts-ignore
+          // Faulty TS library, fontSize exists.
+          object.set({ charSpacing: spacing });
+        }
+      });
+      canvas.renderAll();
+    },
+    getTextSpacing: () => {
+      const selectedObject = selectedObjects[0];
+
+      if (!selectedObject) {
+        return 100;
+      }
+
+      // @ts-ignore
+      // Faulty TS library, fontSize exists.
+      const value = selectedObject.get("charSpacing") || 100;
+
+      return value;
+    },
     changeBackground: (value: string) => {
       const workspace = getWorkspace();
       workspace?.set({ fill: value });

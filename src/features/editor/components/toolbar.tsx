@@ -33,6 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 
 interface ToolbarProps {
   editor: Editor | undefined;
@@ -53,7 +54,8 @@ export const Toolbar = ({
   const initialFontLinethrough = editor?.getActiveFontLinethrough();
   const initialFontUnderline = editor?.getActiveFontUnderline();
   const initialTextAlign = editor?.getActiveTextAlign();
-  const initialFontSize = editor?.getActiveFontSize() || FONT_SIZE
+  const initialFontSize = editor?.getActiveFontSize() || FONT_SIZE;
+  const initialTextSpacing = editor?.getTextSpacing() || 100;
 
   const [properties, setProperties] = useState({
     fillColor: initialFillColor,
@@ -65,6 +67,7 @@ export const Toolbar = ({
     fontUnderline: initialFontUnderline,
     textAlign: initialTextAlign,
     fontSize: initialFontSize,
+    textSpacing: initialTextSpacing
   });
 
   const selectedObject = editor?.selectedObjects[0];
@@ -82,6 +85,17 @@ export const Toolbar = ({
     setProperties((current) => ({
       ...current,
       fontSize: value,
+    }));
+  };
+
+  const onChangeTextSpacing = (value: number) => {
+    if (!selectedObject) {
+      return;
+    }
+    editor?.chnageTextSpacing(value);
+    setProperties((current) => ({
+      ...current,
+      textSpacing: value,
     }));
   };
 
@@ -388,7 +402,20 @@ export const Toolbar = ({
           </Hint>
         </div>
       )}
-
+      <div className="flex items-center h-full justify-center ">
+        <Hint label="Effects" side="bottom" sideOffset={5}>
+          <Slider
+            min={-200}
+            max={600}
+            step={5}
+            value={[properties.textSpacing]}
+            onValueChange={(e) => {
+              onChangeTextSpacing(Number(e[0]));
+            }}
+            className="w-[100px]"
+          />
+        </Hint>
+      </div>
 
       {isImage && (
         <div className="flex items-center h-full justify-center">

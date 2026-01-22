@@ -8,6 +8,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
+import { set } from "date-fns";
+import { FontSizeInput } from "./font-size-input";
 
 interface EffectsSidebarProps {
     editor: Editor | undefined;
@@ -39,14 +41,14 @@ export const EffectsSidebar = ({
     const [outlineThickness, setOutlineThickness] = useState(2);
     const [outlineColor, setOutlineColor] = useState("#000000");
 
-    const [shadowDistance, setShadowDistance] = useState(56);
-    const [shadowAngle, setShadowAngle] = useState(-65);
+    const [offsetX, setOffsetX] = useState(0);
+    const [offsetY, setOffsetY] = useState(10);
     const [shadowBlur, setShadowBlur] = useState(0);
     const [shadowOpacity, setShadowOpacity] = useState(40);
     const [shadowColor, setShadowColor] = useState("#000000");
 
     const applyEffects = () => {
-        const { x, y } = polarToCartesian(shadowDistance, shadowAngle);
+        //const { x, y } = polarToCartesian(shadowDistance, shadowAngle);
 
         editor?.updateTextEffects({
             outline: {
@@ -56,8 +58,8 @@ export const EffectsSidebar = ({
             shadow: {
                 color: hexToRgba(shadowColor, shadowOpacity / 100),
                 blur: shadowBlur,
-                offsetX: x,
-                offsetY: y,
+                offsetX: offsetX,
+                offsetY: offsetY,
             },
         });
     };
@@ -78,56 +80,81 @@ export const EffectsSidebar = ({
                 {/* ===== SHADOW ===== */}
                 <div className="space-y-4">
                     <h4 className="text-sm font-medium">Drop Shadow</h4>
+                    <div className="shrink-0 h-[56px]  bg-white w-full flex items-center  p-2 gap-x-2">
 
-                    <label className="text-xs">Offset</label>
 
-                    <Slider
-                        min={0}
-                        max={100}
-                        step={1}
-                        value={[shadowDistance]}
-                        onValueChange={(e) => {
-                            setShadowDistance(Number(e[0]));
-                            applyEffects();
-                        }}
-                    />
+                        <label className="text-xs">Offset X </label>
 
-                    <label className="text-xs">Direction</label>
+                        <Slider
+                            min={-100}
+                            max={100}
+                            step={1}
+                            value={[offsetX]}
+                            onValueChange={(e) => {
+                                setOffsetX(Number(e[0]));
+                                applyEffects();
+                            }}
+                        />
+                        <FontSizeInput
+                            value={offsetX}
+                            onChange={setOffsetX}
+                        />
+                    </div>
+                    <div className="shrink-0 h-[56px]  bg-white w-full flex items-center  p-2 gap-x-2">
 
-                    <Slider
-                        min={-180}
-                        max={180}
-                        step={1}
-                        value={[shadowAngle]}
-                        onValueChange={(e) => {
-                            setShadowAngle(Number(e[0]));
-                            applyEffects();
-                        }}
-                    />
-                    <label className="text-xs">Blur</label>
-                    <Slider
-                        min={0}
-                        max={50}
-                        step={1}
-                        value={[shadowBlur]}
-                        onValueChange={(e) => {
-                            setShadowBlur(Number(e[0]));
-                            applyEffects();
-                        }}
-                    />
-                    <label className="text-xs">Transparency</label>
-                    <Slider
-                        min={0}
-                        max={100}
-                        step={1}
-                        value={[shadowOpacity]}
-                        onValueChange={(e) => {
-                            setShadowOpacity(Number(e[0]));
-                            applyEffects();
-                        }}
-                    />
+                        <label className="text-xs">Offset Y ({offsetY})</label>
 
-                    <div className="flex items-center justify-between">
+                        <Slider
+                            min={-100}
+                            max={100}
+                            step={1}
+                            value={[offsetY]}
+                            onValueChange={(e) => {
+                                setOffsetY(Number(e[0]));
+                                applyEffects();
+                            }}
+                        />
+                        <FontSizeInput
+                            value={offsetY}
+                            onChange={setOffsetY}
+                        />
+                    </div>
+                    <div className="shrink-0 h-[56px]  bg-white w-full flex items-center  p-2 gap-x-2">
+                        <label className="text-xs">Blur</label>
+                        <Slider
+                            min={0}
+                            max={50}
+                            step={1}
+                            value={[shadowBlur]}
+                            onValueChange={(e) => {
+                                setShadowBlur(Number(e[0]));
+                                applyEffects();
+                            }}
+                        />
+                        <FontSizeInput
+                            value={shadowBlur}
+                            onChange={setShadowBlur}
+                        />
+                    </div>
+                    <div className="shrink-0 h-[56px]  bg-white w-full flex items-center  p-2 gap-x-2">
+                        <label className="text-xs">Transparency</label>
+                        <Slider
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={[shadowOpacity]}
+                            onValueChange={(e) => {
+                                setShadowOpacity(Number(e[0]));
+                                applyEffects();
+                            }}
+                        />
+                        <FontSizeInput
+                            value={shadowOpacity}
+                            onChange={setShadowOpacity}
+                        />
+                    </div>
+
+                    <div className="flex items-center items-center  p-2 gap-x-2">
                         <span className="text-xs">Color</span>
                         <Input
                             type="color"

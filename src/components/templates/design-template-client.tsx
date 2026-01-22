@@ -71,8 +71,8 @@ export const DesignTemplateClient = ({ templates, type, total, page, admin }: Pr
         const brandName = brandRef.current?.value || "";
         const tagLine = taglineRef.current?.value || "";
         const params = new URLSearchParams();
-        if (brandInput) params.set("brand", brandName);
-        if (taglineInput) params.set("tagline", tagLine);
+        if (brandName) params.set("brand", brandName);
+        if (tagLine) params.set("tagline", tagLine);
         params.set("page", "1");
 
 

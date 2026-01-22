@@ -303,4 +303,6 @@ export interface Editor {
     color: string
   ) => void;
   applyLogoLayout: (layout: LogoLayoutId) => void;
+  chnageTextSpacing: (spacing: number) => void;
+  getTextSpacing: () => number;
 };
