@@ -1,10 +1,10 @@
 "use client";
 
-import { useEditor } from "@/features/editor/hooks/use-editor";
 import { Editor } from "../types";
-import { LOGO_LAYOUT_ITEMS } from "../layout/logo-layout.registry";
 import { LayoutPreview } from "../layout/LayoutPreview";
 import clsx from "clsx";
+import { LOGO_LAYOUT_RECIPES } from "../layout/logo-layout.recipes";
+import { LogoLayoutId } from "../layout/logo-layout.types";
 
 
 interface Props {
@@ -25,16 +25,16 @@ export const LayoutSidebar = ({ editor, activeTool }: Props) => {
             <h3 className="font-semibold">Edit Layout</h3>
 
             <div className="grid grid-cols-3 gap-3 p-4">
-                {LOGO_LAYOUT_ITEMS.map((layout) => (
+                {Object.keys(LOGO_LAYOUT_RECIPES).map((id) => (
                     <button
-                        key={layout.id}
-                        onClick={() => editor.applyLogoLayout(layout.id)}
+                        key={id}
+                        onClick={() => editor.applyLogoLayout(id as LogoLayoutId)}
                         className={clsx(
                             "rounded-md border bg-white p-3 hover:border-blue-500 transition",
                             "flex items-center justify-center"
                         )}
                     >
-                        <LayoutPreview type={layout.preview} />
+                        <LayoutPreview layoutId={id as LogoLayoutId} />
                     </button>
                 ))}
             </div>

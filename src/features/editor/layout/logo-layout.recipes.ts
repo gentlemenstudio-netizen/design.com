@@ -1,11 +1,13 @@
 import { LogoLayoutId } from "./logo-layout.types";
-
+type IconSizeMode = "big" | "normal" | "small";
 export type LogoLayoutRecipe = {
-    direction: "vertical" | "horizontal";
+    direction: "top" | "bottom" | "left" | "right"
     iconPosition: "start" | "end" | "center";
-    iconScale: number;
-    textScale: number;
     spacing: number;
+    brandAlign: "left" | "center" | "right";
+    taglineAlign: "left" | "center" | "right";
+    iconSize?: IconSizeMode;
+
 };
 
 export const LOGO_LAYOUT_RECIPES: Record<
@@ -13,78 +15,89 @@ export const LOGO_LAYOUT_RECIPES: Record<
     LogoLayoutRecipe
 > = {
     "icon-top": {
-        direction: "vertical",
+        direction: "top",
         iconPosition: "start",
-        iconScale: 1,
-        textScale: 1.5,
-        spacing: 20,
+        spacing: 1,
+        brandAlign: "center",
+        taglineAlign: "center",
+        iconSize: "normal"
     },
-
-    "icon-top-big": {
-        direction: "vertical",
+    "icon-top-small": {
+        direction: "top",
         iconPosition: "start",
-        iconScale: 1.5,
-        textScale: 1,
-        spacing: 20,
+        spacing: 1,
+        brandAlign: "center",
+        taglineAlign: "center",
+        iconSize: "small"
+    },
+    "icon-top-big": {
+        direction: "top",
+        iconPosition: "start",
+        spacing: 10,
+        brandAlign: "center",
+        taglineAlign: "center",
+        iconSize: "big"
+    },
+    "icon-left-big": {
+        direction: "left",
+        iconPosition: "start",
+        spacing: 1,
+        brandAlign: "left",
+        taglineAlign: "left",
+        iconSize: "big"
     },
 
     "icon-left": {
-        direction: "horizontal",
+        direction: "left",
         iconPosition: "start",
-        iconScale: 0.15,
-        textScale: 1,
-        spacing: 32,
+        spacing: 5,
+        brandAlign: "left",
+        taglineAlign: "left",
+        iconSize: "normal"
     },
 
-    "icon-left-big": {
-        direction: "horizontal",
-        iconPosition: "start",
-        iconScale: 1.5,
-        textScale: 0.85,
-        spacing: 36,
-    },
+
 
     "icon-only": {
-        direction: "vertical",
+        direction: "top",
         iconPosition: "center",
-        iconScale: 1.6,
-        textScale: 0,
         spacing: 0,
+        brandAlign: "left",
+        taglineAlign: "left",
+        iconSize: "big"
     },
 
     "text-only": {
-        direction: "vertical",
+        direction: "top",
         iconPosition: "center",
-        iconScale: 0,
-        textScale: 1.3,
         spacing: 0,
+        brandAlign: "center",
+        taglineAlign: "center",
+        iconSize: "normal"
     },
     "icon-bottom": {
-        direction: "vertical",
+        direction: "bottom",
         iconPosition: "start",
-        iconScale: 0,
-        textScale: 0,
-        spacing: 0
+        spacing: 0,
+        brandAlign: "center",
+        taglineAlign: "center",
+        iconSize: "normal"
     },
     "icon-right": {
-        direction: "vertical",
+        direction: "right",
         iconPosition: "start",
-        iconScale: 0.15,
-        textScale: 1,
-        spacing: 32,
+        spacing: 5,
+        brandAlign: "right",
+        taglineAlign: "right",
+        iconSize: "normal"
     },
     "icon-left-small": {
-        direction: "vertical",
+        direction: "left",
         iconPosition: "start",
-        iconScale: 0,
-        textScale: 0,
-        spacing: 0
+        spacing: 0,
+        brandAlign: "center",
+        taglineAlign: "center",
+        iconSize: "small"
     },
-    "icon-top-small": {
-        direction: "vertical",
-        iconPosition: "start",
-        iconScale: 0,
-        textScale: 0,
-        spacing: 0
-    }
+
 };
