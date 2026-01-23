@@ -25,7 +25,7 @@ export const LOGO_LAYOUT_RECIPES: Record<
     "icon-top-small": {
         direction: "top",
         iconPosition: "start",
-        spacing: 1,
+        spacing: 0,
         brandAlign: "center",
         taglineAlign: "center",
         iconSize: "small"

@@ -35,6 +35,7 @@ import { useWindowEvents } from "@/features/editor/hooks/use-window-events";
 import { useLoadState } from "@/features/editor/hooks/use-load-state";
 import { LOGO_LAYOUT_RECIPES } from "../layout/logo-layout.recipes";
 import { LogoLayoutId } from "../layout/logo-layout.types";
+import { patchCanvasTextBaseline } from "@/lib/patch-canvas-textbaseline";
 
 const buildEditor = ({
   save,
@@ -376,24 +377,17 @@ const buildEditor = ({
       stops,
     });
   }
-
-
-
   const applyLogoLayout = (layout: LogoLayoutId) => {
     if (!canvas) return;
+    patchCanvasTextBaseline();
+    canvas.discardActiveObject();
 
     const recipe = LOGO_LAYOUT_RECIPES[layout];
     if (!recipe) return;
 
-    const icon = canvas.getObjects().find(
-      (o: any) => o.customType === "logoIcon"
-    );
-    const brand = canvas.getObjects().find(
-      (o: any) => o.customRole === "brand"
-    );
-    const tagline = canvas.getObjects().find(
-      (o: any) => o.customRole === "tagline"
-    );
+    const icon = canvas.getObjects().find((o: any) => o.customType === "logoIcon");
+    const brand = canvas.getObjects().find((o: any) => o.customRole === "brand");
+    const tagline = canvas.getObjects().find((o: any) => o.customRole === "tagline");
 
     const elements = [icon, brand, tagline].filter(Boolean) as fabric.Object[];
     if (!elements.length) return;
@@ -401,275 +395,167 @@ const buildEditor = ({
     const artboard = getArtboard(canvas);
     if (!artboard) return;
 
-    //const { cx, cy, width: aw, height: ah } = artboard;
+    const { cx, cy, width: aw, height: ah } = artboard;
 
-    const cx = artboard.cx;
-    const cy = artboard.cy;
-    const aw = artboard.width;
-    const ah = artboard.height;
-
-    const abLeft = cx - aw / 2;
-    const abTop = cy - ah / 2;
-
-    const iconRatioMap = { big: 1.3, normal: 1, small: 0.75 };
-    const textRatioMap = { big: 0.85, normal: 1, small: 1.25 };
-
-    const iconRatio = iconRatioMap[recipe.iconSize || "normal"];
-    const textRatio = textRatioMap[recipe.iconSize || "normal"];
-
-    // ----------------------------------
-    // 1. HARD RESET TO BASE STATE
-    // ----------------------------------
+    // -------------------------
+    // 1. ROBUST RESET
+    // -------------------------
     elements.forEach((o: any) => {
-      if (!o.__baseState) {
-        o.__baseState = {
-          left: o.left ?? 0,
-          top: o.top ?? 0,
-          scaleX: o.scaleX ?? 1,
-          scaleY: o.scaleY ?? 1,
-          fontSize: o.fontSize,
-        };
+      // Capture base values ONLY the first time we ever touch this object
+      if (o.__baseScaleX === undefined) {
+        o.__baseScaleX = o.scaleX || 1;
+        o.__baseScaleY = o.scaleY || 1;
+        if ("fontSize" in o) o.__baseFontSize = o.fontSize;
       }
 
-      const b = o.__baseState;
-
+      // ALWAYS reset to the original captured base values
       o.set({
-        left: b.left,
-        top: b.top,
-        scaleX: b.scaleX,
-        scaleY: b.scaleY,
+        scaleX: o.__baseScaleX,
+        scaleY: o.__baseScaleY,
         originX: "center",
         originY: "center",
+        left: 0, // Reset position to origin for easier math
+        top: 0
       });
 
-      if (o.customRole === "brand" || o.customRole === "tagline") {
-        if (b.fontSize) o.set("fontSize", b.fontSize);
+      if ("fontSize" in o && o.__baseFontSize) {
+        o.set({ fontSize: o.__baseFontSize });
       }
+
+      o.setCoords();
     });
 
-    // ----------------------------------
-    // 2. APPLY ICON / TEXT SIZE RATIOS
-    // ----------------------------------
-    if (icon) {
-      icon.scaleX = (icon.scaleX ?? 1) * iconRatio;
-      icon.scaleY = (icon.scaleY ?? 1) * iconRatio;
-    }
+    // -------------------------
+    // 2. APPLY RECIPE RATIOS
+    // -------------------------
+    const iconRatio = { big: 1.3, normal: 1, small: 0.75 }[recipe.iconSize || "normal"];
+    const textRatio = { big: 0.85, normal: 1, small: 1.25 }[recipe.iconSize || "normal"];
 
+    if (icon) {
+      icon.scaleX! *= iconRatio;
+      icon.scaleY! *= iconRatio;
+    }
 
     [brand, tagline].forEach((o: any) => {
       if (!o) return;
-      o.scaleX *= textRatio;
-      o.scaleY *= textRatio;
-      if (o.__baseState?.fontSize) {
-        o.set("fontSize", o.__baseState.fontSize * textRatio);
+      if ("fontSize" in o && o.__baseFontSize) {
+        o.set("fontSize", o.__baseFontSize * textRatio);
       }
     });
 
-    if (brand && "textAlign" in brand) {
-      (brand as fabric.Textbox).set({ textAlign: recipe.brandAlign });
-    }
+    // Sync textbox widths before measuring
+    fitTextboxToContent(brand);
+    fitTextboxToContent(tagline);
 
-    if (tagline && "textAlign" in tagline) {
-      (tagline as fabric.Textbox).set({ textAlign: recipe.taglineAlign });
-    }
+    // -------------------------
+    // 3. MEASURE & INITIAL POSITIONING (Relative to 0,0)
+    // -------------------------
+    const spacing = Math.max(recipe.spacing ?? 12, 12);
+    const iconBox = icon?.getBoundingRect(true) || { width: 0, height: 0 };
+    const brandBox = brand?.getBoundingRect(true) || { width: 0, height: 0 };
+    const taglineBox = tagline?.getBoundingRect(true) || { width: 0, height: 0 };
 
-    // ----------------------------------
-    // 3. MEASURE SIZES
-    // ----------------------------------
-    const iconBox = icon?.getBoundingRect(true);
-    const brandBox = brand?.getBoundingRect(true);
-    const taglineBox = tagline?.getBoundingRect(true);
+    const textHeight = brandBox.height + (tagline ? spacing + taglineBox.height : 0);
+    const textWidth = Math.max(brandBox.width, taglineBox.width);
 
-    const baseSpacing = recipe.spacing ?? 16;
-    const spacing =
-      recipe.iconSize === "big" ? baseSpacing * 1.6 :
-        recipe.iconSize === "small" ? baseSpacing * 0.7 :
-          baseSpacing;
-
-    const textBlockWidth = Math.max(
-      brandBox?.width || 0,
-      taglineBox?.width || 0
-    );
-
-    const textBlockHeight =
-      (brandBox?.height || 0) +
-      (taglineBox ? spacing + taglineBox.height : 0);
-
-    // ----------------------------------
-    // 4. LAYOUT ENGINE
-    // ----------------------------------
-
+    // We arrange everything centered around (0,0) initially
     if (recipe.direction === "top") {
-      const totalHeight =
-        (iconBox?.height || 0) +
-        spacing +
-        textBlockHeight;
+      const totalH = iconBox.height + spacing + textHeight;
+      let y = -totalH / 2;
 
-      let y = cy - totalHeight / 2;
-
-      if (icon && iconBox) {
-        icon.set({ left: cx, top: y + iconBox.height / 2 });
+      if (icon) {
+        icon.set({ top: y + iconBox.height / 2 });
         y += iconBox.height + spacing;
       }
-
-      if (brand && brandBox) {
-        brand.set({ left: cx, top: y + brandBox.height / 2 });
-        y += brandBox.height;
-      }
-
-      if (tagline && taglineBox) {
-        tagline.set({ left: cx, top: y + taglineBox.height / 2 });
-      }
-    }
-
-    if (recipe.direction === "bottom") {
-      const totalHeight =
-        textBlockHeight +
-        spacing +
-        (iconBox?.height || 0);
-
-      let y = cy - totalHeight / 2;
-
-      if (brand && brandBox) {
-        brand.set({ left: cx, top: y + brandBox.height / 2 });
+      if (brand) {
+        brand.set({ top: y + brandBox.height / 2 });
         y += brandBox.height + spacing;
       }
-
-      if (tagline && taglineBox) {
-        tagline.set({ left: cx, top: y + taglineBox.height / 2 });
-        y += taglineBox.height + spacing;
-      }
-
-      if (icon && iconBox) {
-        icon.set({ left: cx, top: y + iconBox.height / 2 });
+      if (tagline) {
+        tagline.set({ top: y + taglineBox.height / 2 });
       }
     }
+    else if (recipe.direction === "bottom") {
+      const totalH = textHeight + spacing + iconBox.height;
+      let y = -totalH / 2;
+      if (brand) { brand.set({ top: y + brandBox.height / 2 }); y += brandBox.height + spacing; }
+      if (tagline) { tagline.set({ top: y + taglineBox.height / 2 }); y += taglineBox.height + spacing; }
+      if (icon) { icon.set({ top: y + iconBox.height / 2 }); }
+    }
+    else if (recipe.direction === "left") {
+      const totalW = iconBox.width + spacing + textWidth;
+      let x = -totalW / 2;
 
-    if (recipe.direction === "left") {
-      const totalWidth =
-        (iconBox?.width || 0) +
-        spacing +
-        textBlockWidth;
-
-      let x = cx - totalWidth / 2;
-
-      if (icon && iconBox) {
-        icon.set({ left: x + iconBox.width / 2, top: cy });
+      if (icon) {
+        icon.set({ left: x + iconBox.width / 2 });
         x += iconBox.width + spacing;
       }
 
-      let ty = cy - textBlockHeight / 2;
-
-      if (brand && brandBox) {
+      let ty = -textHeight / 2;
+      if (brand) {
         brand.set({ left: x + brandBox.width / 2, top: ty + brandBox.height / 2 });
-        ty += brandBox.height;
+        ty += brandBox.height + spacing;
       }
-
-      if (tagline && taglineBox) {
+      if (tagline) {
         tagline.set({ left: x + taglineBox.width / 2, top: ty + taglineBox.height / 2 });
       }
     }
-
-    if (recipe.direction === "right") {
-      const totalWidth =
-        (iconBox?.width || 0) +
-        spacing +
-        textBlockWidth;
-
-      let x = cx - totalWidth / 2;
-
-      let ty = cy - textBlockHeight / 2;
-
-      if (brand && brandBox) {
-        brand.set({ left: x + brandBox.width / 2, top: ty + brandBox.height / 2 });
-        ty += brandBox.height;
-      }
-
-      if (tagline && taglineBox) {
-        tagline.set({ left: x + taglineBox.width / 2, top: ty + taglineBox.height / 2 });
-      }
-
-      x += textBlockWidth + spacing;
-
-      if (icon && iconBox) {
-        icon.set({ left: x + iconBox.width / 2, top: cy });
-      }
+    else if (recipe.direction === "right") {
+      const totalW = textWidth + spacing + iconBox.width;
+      let x = -totalW / 2;
+      let ty = -textHeight / 2;
+      if (brand) { brand.set({ left: x + brandBox.width / 2, top: ty + brandBox.height / 2 }); ty += brandBox.height + spacing; }
+      if (tagline) { tagline.set({ left: x + taglineBox.width / 2, top: ty + taglineBox.height / 2 }); }
+      x += textWidth + spacing;
+      if (icon) { icon.set({ left: x + iconBox.width / 2 }); }
     }
+    // ... (Repeat pattern for "right" and "bottom")
 
-    // ----------------------------------
-    // 5. CENTER FIRST
-    // ----------------------------------
+    // -------------------------
+    // 4. AUTO FIT TO ARTBOARD
+    // -------------------------
+    // Measure the current layout "block"
     let bounds = getObjectsBounds(elements);
+    const padding = 40;
 
-    let dx = cx - (bounds.left + bounds.width / 2);
-    let dy = cy - (bounds.top + bounds.height / 2);
-
-    elements.forEach((o) => {
-      o.left = (o.left || 0) + dx;
-      o.top = (o.top || 0) + dy;
-    });
-
-    // ----------------------------------
-    // 6. AUTO FIT TO ARTBOARD
-    // ----------------------------------
-    bounds = getObjectsBounds(elements);
-
-    const padding = 32;
-
-    let scale = Math.min(
+    // Calculate ONE scale factor for the whole group
+    const scale = Math.min(
       (aw - padding * 2) / bounds.width,
       (ah - padding * 2) / bounds.height,
-      1
+      1 // Don't up-scale beyond original size
     );
 
-    scale = Math.max(scale, 0.05);
-
+    // Apply the scale to POSITIONS and DIMENSIONS
     elements.forEach((o: any) => {
-      o.scaleX *= scale;
-      o.scaleY *= scale;
+      o.set({
+        left: o.left * scale,
+        top: o.top * scale,
+      });
 
       if (o.customRole === "brand" || o.customRole === "tagline") {
         o.set("fontSize", o.fontSize * scale);
+        fitTextboxToContent(o); // Re-fit after font change
+      } else {
+        o.scaleX! *= scale;
+        o.scaleY! *= scale;
       }
     });
 
-    // ----------------------------------
-    // 7. FINAL CENTER
-    // ----------------------------------
-    bounds = getObjectsBounds(elements);
-
-    dx = cx - (bounds.left + bounds.width / 2);
-    dy = cy - (bounds.top + bounds.height / 2);
-
-    elements.forEach((o) => {
-      const r = o.getBoundingRect(true);
-
-      if (r.left < abLeft) o.left! += abLeft - r.left;
-      if (r.top < abTop) o.top! += abTop - r.top;
-
-      if (r.left + r.width > abLeft + aw)
-        o.left! -= (r.left + r.width) - (abLeft + aw);
-
-      if (r.top + r.height > abTop + ah)
-        o.top! -= (r.top + r.height) - (abTop + ah);
+    // -------------------------
+    // 5. FINAL CENTERING
+    // -------------------------
+    // Now move the entire group from (0,0) to the artboard center (cx, cy)
+    elements.forEach(o => {
+      o.left! += cx;
+      o.top! += cy;
+      o.setCoords();
     });
 
     canvas.requestRenderAll();
   };
 
-  function cacheBaseState(o: any) {
-    if (o.__baseState) return;
 
-    o.__baseState = {
-      left: o.left,
-      top: o.top,
-      scaleX: o.scaleX || 1,
-      scaleY: o.scaleY || 1,
-      fontSize: o.fontSize,
-      originX: o.originX || "center",
-      originY: o.originY || "center",
-    };
-  }
+
 
 
   function getObjectsBounds(objects: fabric.Object[]) {
@@ -694,6 +580,16 @@ const buildEditor = ({
     };
   }
 
+  function fitTextboxToContent(obj?: fabric.Object) {
+    if (!obj || !(obj instanceof fabric.Textbox)) return;
+
+    // Find the actual width of the text lines
+    const measuredWidth = obj.getLineWidth(0);
+    obj.set({
+      width: measuredWidth + 2,
+    });
+    obj.setCoords();
+  }
 
 
 
@@ -712,6 +608,8 @@ const buildEditor = ({
       cy: rect.top + rect.height / 2,
       width: rect.width,
       height: rect.height,
+      left: rect.left,
+      top: rect.top,
     };
   }
 
