@@ -59,8 +59,8 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
     const onUseTemplate = async (template: DesignTemplate) => {
         // ... (Keep existing POST logic to /api/projects)
         const injectedJson = injectTemplateVariables(template.json, {
-            BRAND_NAME: initialBrand.toUpperCase() || "Your Brand",
-            TAGLINE: initialTagline.toUpperCase() || "",
+            BRAND_NAME: initialBrand.toUpperCase() || "LOGOTEXT",
+            TAGLINE: initialTagline.toUpperCase() || "SLOGANHERE",
         });
 
         const res = await fetch("/api/projects", {
@@ -104,8 +104,8 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {templates.map((template) => {
                     const previewJson = injectTemplateVariables(template.json, {
-                        BRAND_NAME: initialBrand.toUpperCase() || "Your Brand",
-                        TAGLINE: initialTagline.toUpperCase() || "",
+                        BRAND_NAME: initialBrand.toUpperCase() || "LOGOTEXT",
+                        TAGLINE: initialTagline.toUpperCase() || "SLOGANHERE"
                     });
 
                     return (
