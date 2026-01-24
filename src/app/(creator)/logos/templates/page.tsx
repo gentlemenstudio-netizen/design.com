@@ -20,7 +20,7 @@ export default async function LogoTemplatesPage({ searchParams }: PageProps) {
     const tagline = searchParams.tagline ?? "";
     const page = Number(searchParams.page ?? "1");
     const admin = searchParams.admin === "true";
-    const limit = 40;
+    const limit = 30;
     const offset = (page - 1) * limit;
 
     const data = await db
