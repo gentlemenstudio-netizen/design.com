@@ -3,9 +3,9 @@
 import { useSession, signOut } from "next-auth/react";
 import { CreditCard, Crown, Loader, LogOut } from "lucide-react";
 
-import { 
-  Avatar, 
-  AvatarFallback, 
+import {
+  Avatar,
+  AvatarFallback,
   AvatarImage
 } from "@/components/ui/avatar";
 import {
@@ -17,12 +17,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePaywall } from "@/features/subscriptions/hooks/use-paywall";
 import { useBilling } from "@/features/subscriptions/api/use-billing";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export const UserButton = () => {
   const { shouldBlock, triggerPaywall, isLoading } = usePaywall();
   const mutation = useBilling();
   const session = useSession();
-
+  const router = useRouter();
   const onClick = () => {
     if (shouldBlock) {
       triggerPaywall();
@@ -37,7 +39,16 @@ export const UserButton = () => {
   }
 
   if (session.status === "unauthenticated" || !session.data) {
-    return null;
+    return (
+
+      <Button
+        variant="secondary"
+        onClick={() => router.push(`/sign-in`)}
+      >
+        Log in
+      </Button>
+
+    );
   }
 
   const name = session.data?.user?.name!;

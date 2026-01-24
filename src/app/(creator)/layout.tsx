@@ -1,19 +1,10 @@
 import { Metadata } from "next/types";
-import { Navbar } from "../(dashboard)/navbar";
-import { Sidebar } from "../(dashboard)/sidebar";
-import {
-    Inter,
-    Poppins,
-    Montserrat,
-    Playfair_Display,
-    Raleway,
-    Bebas_Neue,
-    Oswald,
-} from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { FONT_VARIABLES } from "@/lib/brand-fonts";
+import { Navbar } from "./logos/navbar";
+import { Footer } from "./logos/footer";
 
 
 
@@ -34,14 +25,13 @@ const CreatorLayout = async ({ children }: CreatorLayoutProps) => {
             <html lang="en">
                 <body className={FONT_VARIABLES}>
                     <Providers>
-                        <div className="bg-muted h-full">
-                            <Sidebar />
-                            <div className="lg:pl-[300px] flex flex-col h-full">
-                                <Navbar />
-                                <main className="bg-white flex-1 overflow-auto p-8 lg:rounded-tl-2xl">
-                                    {children}
-                                </main>
-                            </div>
+                        {/* Wrapper background set to Black to match Navbar */}
+                        <div className="bg-black h-screen flex flex-col">
+                            <Navbar />
+                            <main className="flex-1 bg-white overflow-auto lg:rounded-tl-[48px] shadow-2xl">
+                                {children}
+                                <Footer />
+                            </main>
                         </div>
                     </Providers>
                 </body>

@@ -1,15 +1,5 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
-import {
-  Inter,
-  Poppins,
-  Montserrat,
-  Playfair_Display,
-  Raleway,
-  Bebas_Neue,
-  Oswald,
-} from "next/font/google";
-
 import { SubscriptionAlert } from "@/features/subscriptions/components/subscription-alert";
 import { auth } from "@/auth";
 import { Modals } from "@/components/modals";

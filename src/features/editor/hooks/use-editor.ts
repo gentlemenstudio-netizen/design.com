@@ -469,7 +469,7 @@ const buildEditor = ({
       }
       if (brand) {
         brand.set({ top: y + brandBox.height / 2 });
-        y += brandBox.height + spacing;
+        y += brandBox.height;
       }
       if (tagline) {
         tagline.set({ top: y + taglineBox.height / 2 });
@@ -478,7 +478,7 @@ const buildEditor = ({
     else if (recipe.direction === "bottom") {
       const totalH = textHeight + spacing + iconBox.height;
       let y = -totalH / 2;
-      if (brand) { brand.set({ top: y + brandBox.height / 2 }); y += brandBox.height + spacing; }
+      if (brand) { brand.set({ top: y + brandBox.height / 2 }); y += brandBox.height; }
       if (tagline) { tagline.set({ top: y + taglineBox.height / 2 }); y += taglineBox.height + spacing; }
       if (icon) { icon.set({ top: y + iconBox.height / 2 }); }
     }
@@ -494,7 +494,7 @@ const buildEditor = ({
       let ty = -textHeight / 2;
       if (brand) {
         brand.set({ left: x + brandBox.width / 2, top: ty + brandBox.height / 2 });
-        ty += brandBox.height + spacing;
+        ty += brandBox.height;
       }
       if (tagline) {
         tagline.set({ left: x + taglineBox.width / 2, top: ty + taglineBox.height / 2 });
@@ -504,7 +504,7 @@ const buildEditor = ({
       const totalW = textWidth + spacing + iconBox.width;
       let x = -totalW / 2;
       let ty = -textHeight / 2;
-      if (brand) { brand.set({ left: x + brandBox.width / 2, top: ty + brandBox.height / 2 }); ty += brandBox.height + spacing; }
+      if (brand) { brand.set({ left: x + brandBox.width / 2, top: ty + brandBox.height / 2 }); ty += brandBox.height; }
       if (tagline) { tagline.set({ left: x + taglineBox.width / 2, top: ty + taglineBox.height / 2 }); }
       x += textWidth + spacing;
       if (icon) { icon.set({ left: x + iconBox.width / 2 }); }

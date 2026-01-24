@@ -33,7 +33,7 @@ export const SignInCard = () => {
     signIn("credentials", {
       email: email,
       password: password,
-      callbackUrl: "/",
+      callbackUrl: window.location.href,
     });
   };
 
@@ -42,7 +42,7 @@ export const SignInCard = () => {
     setLoadingGithub(provider === "github");
     setLoadingGoogle(provider === "google");
 
-    signIn(provider, { callbackUrl: "/" });
+    signIn(provider, { callbackUrl: window.location.href }); // Returns user to current page
   };
 
   return (
@@ -99,7 +99,7 @@ export const SignInCard = () => {
             )}
             Continue with Google
           </Button>
-          <Button
+          {/* <Button
             onClick={() => onProviderSignIn("github")}
             size="lg"
             variant="outline"
@@ -112,7 +112,7 @@ export const SignInCard = () => {
               <FaGithub className="mr-2 size-5 top-2.5 left-2.5 absolute" />
             )}
             Continue with Github
-          </Button>
+          </Button> */}
         </div>
         <p className="text-xs text-muted-foreground">
           Don&apos;t have an account?{" "}

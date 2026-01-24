@@ -67,8 +67,8 @@ export default {
 
         return user;
       },
-    }), 
-    GitHub, 
+    }),
+    GitHub,
     Google
   ],
   pages: {
@@ -88,7 +88,7 @@ export default {
     },
     jwt({ token, user }) {
       if (user) {
-        token.id = user.id;  
+        token.id = user.id;
       }
 
       return token;
