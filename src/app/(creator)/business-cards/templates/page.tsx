@@ -35,9 +35,11 @@ export default async function LogoTemplatesPage({ searchParams }: PageProps) {
         .from(templates)
         .where(eq(templates.category, "business-card"));
 
+    const totalPages = Math.ceil(count / limit);
+
     return (
         <div className="p-6 space-y-6">
-            <DesignTemplateClient templates={data} type="business-card" total={count} page={page} />
+            <DesignTemplateClient templates={data} type="business-card" totalPages={count} page={page} />
         </div>
     );
 }

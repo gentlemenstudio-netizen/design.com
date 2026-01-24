@@ -34,10 +34,11 @@ export default async function LogoTemplatesPage({ searchParams }: PageProps) {
         .select({ count: sql<number>`count(*)` })
         .from(templates)
         .where(eq(templates.category, "flyer"));
+    const totalPages = Math.ceil(count / limit);
 
     return (
         <div className="p-6 space-y-6">
-            <DesignTemplateClient templates={data} type="flyers" total={count} page={page} />
+            <DesignTemplateClient templates={data} type="flyers" totalPages={count} page={page} />
         </div>
     );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react"; // 1. Import useSession
 
@@ -46,8 +46,6 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
 
     const initialBrand = searchParams.get("brand") || "";
     const initialTagline = searchParams.get("tagline") || "";
-    const [appliedBrand, setAppliedBrand] = useState(initialBrand);
-    const [appliedTagline, setAppliedTagline] = useState(initialTagline);
 
     /** 🔁 Action handler with Auth Check */
     const handleTemplateClick = (template: DesignTemplate) => {
@@ -61,15 +59,15 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
     const onUseTemplate = async (template: DesignTemplate) => {
         // ... (Keep existing POST logic to /api/projects)
         const injectedJson = injectTemplateVariables(template.json, {
-            BRAND_NAME: appliedBrand.toUpperCase() || "Your Brand",
-            TAGLINE: appliedTagline.toUpperCase() || "",
+            BRAND_NAME: initialBrand.toUpperCase() || "Your Brand",
+            TAGLINE: initialTagline.toUpperCase() || "",
         });
 
         const res = await fetch("/api/projects", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                name: `${appliedBrand || "Brand"} Design`,
+                name: `${initialBrand || "Brand"} Design`,
                 json: JSON.stringify(injectedJson),
                 width: template.width,
                 height: template.height,
@@ -106,8 +104,8 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {templates.map((template) => {
                     const previewJson = injectTemplateVariables(template.json, {
-                        BRAND_NAME: appliedBrand.toUpperCase() || "Your Brand",
-                        TAGLINE: appliedTagline.toUpperCase() || "",
+                        BRAND_NAME: initialBrand.toUpperCase() || "Your Brand",
+                        TAGLINE: initialTagline.toUpperCase() || "",
                     });
 
                     return (
