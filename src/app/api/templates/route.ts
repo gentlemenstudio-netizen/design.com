@@ -17,6 +17,8 @@ export async function POST(req: Request) {
         name: body.name,
         category: body.category,
         json: body.json,
+        style: body.style,
+        tags: body.tags,
         width: body.width,
         height: body.height,
         createdBy: session.user.id,

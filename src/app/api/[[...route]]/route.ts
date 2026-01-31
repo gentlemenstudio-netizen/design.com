@@ -30,7 +30,7 @@ const routes = app
   .route("/users", users)
   .route("/images", images)
   .route("/projects", projects)
-  .route("/templates", templates)
+  .route("/templates", templates)  
   .route("/subscriptions", subscriptions);
 
 export const GET = handle(app);

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { db } from "@/db/drizzle";
 import { templates } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { DesignTemplateClient } from "@/components/templates/design-template-client";
 import { Search } from "lucide-react";
 
@@ -22,18 +22,36 @@ export default async function LogoTemplatesPage({ searchParams }: PageProps) {
     const admin = searchParams.admin === "true";
     const limit = 30;
     const offset = (page - 1) * limit;
+    const firstLetter = brand.charAt(0).toLowerCase();
 
     const data = await db
-        .select()
-        .from(templates)
-        .where(eq(templates.category, "logo"))
-        .limit(limit)
-        .offset(offset);
+    .select()
+    .from(templates)
+    .where(eq(templates.category, "logo")) // We keep the category filter
+    .orderBy(
+        // Priority 1: Brand name matches the template name (Highest)
+        desc(sql`CASE WHEN ${templates.name} ILIKE ${'%' + brand + '%'} THEN 2 ELSE 0 END`),
+        
+        // Priority 2: Brand name or first letter matches the tags
+        desc(sql`CASE 
+            WHEN ${brand} = ANY(${templates.tags}) THEN 1 
+            WHEN ${firstLetter} = ANY(${templates.tags}) THEN 1
+            ELSE 0 
+        END`),
+        
+        // Priority 3: Show newest logos first among the remaining
+        desc(templates.createdAt)
+    )
+    .limit(limit)
+    .offset(offset);
 
-    const [{ count }] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(templates)
-        .where(eq(templates.category, "logo"));
+// 3. Count remains the same for the total category
+const [{ count }] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(templates)
+    .where(eq(templates.category, "logo"));
+
+  
 
     const totalPages = Math.ceil(count / limit);
 

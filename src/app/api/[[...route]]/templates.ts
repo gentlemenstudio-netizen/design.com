@@ -24,12 +24,15 @@ app.get("/:id", async (c) => {
 
 app.patch("/:id", async (c) => {
     const id = c.req.param("id");
-    const { json, width, height } = await c.req.json();
+    const { name,json, width, height, style, tags } = await c.req.json();
 
     await db
         .update(templates)
         .set({
+            name,
             json,
+            style,
+            tags,
             width,
             height,
         })

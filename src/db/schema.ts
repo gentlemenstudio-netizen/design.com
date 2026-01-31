@@ -153,7 +153,8 @@ export const templates = pgTable("templates", {
 
   category: text("category").notNull(),
   // "logo" | "business-card" | "flyer"
-
+  style: text("style"), // New Field
+  tags: text("tags").array(), // New Field
   json: jsonb("json").notNull(),
 
   width: integer("width").notNull(),
@@ -163,3 +164,5 @@ export const templates = pgTable("templates", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+
