@@ -170,40 +170,30 @@ const buildEditor = ({
   };
 
   const updateTextEffects = (effects: TextEffects) => {
-    const obj = canvas.getActiveObject();
-    if (!obj || obj.type !== "textbox") return;
+    const selectedObject = canvas.getActiveObject();
 
-    /* ===== OUTLINE ===== */
-    if (effects.outline) {
-      const { color, thickness } = effects.outline;
-
-      obj.set({
-        stroke: thickness > 0 ? color : undefined,
-        strokeWidth: thickness > 0 ? thickness : 0,
-        paintFirst: thickness > 0 ? "stroke" : "fill",
-      });
-    }
-
-    /* ===== SHADOW ===== */
+  if (selectedObject && isTextType(selectedObject.type)) {
+    // Handle Shadow
     if (effects.shadow) {
-      const { color, blur, offsetX, offsetY } = effects.shadow;
-
-      const hasShadow = blur > 0 || offsetX !== 0 || offsetY !== 0;
-
-      obj.set(
-        "shadow",
-        hasShadow
-          ? new fabric.Shadow({
-            color,
-            blur,
-            offsetX,
-            offsetY,
-          })
-          : undefined
-      );
+      selectedObject.set("shadow", new fabric.Shadow(effects.shadow));
+    } else {
+      selectedObject.set("shadow", undefined);
     }
 
-    canvas.requestRenderAll();
+    // Handle Outline
+    if (effects.outline) {
+      selectedObject.set("stroke", effects.outline.color);
+      selectedObject.set("strokeWidth", effects.outline.thickness);
+      // Optional: Set strokeLineJoin for cleaner corners
+      selectedObject.set("strokeLineJoin", "round");
+    } else {
+    //  selectedObject.set("stroke", null);
+      selectedObject.set("strokeWidth", 0);
+    }
+
+    canvas.renderAll();
+    save(); // Push to history
+  }
   };
   const recolorLogoIcon = (colors: string[]) => {
     const icon = canvas
