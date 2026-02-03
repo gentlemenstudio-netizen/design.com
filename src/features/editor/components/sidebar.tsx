@@ -52,7 +52,7 @@ export const Sidebar = ({
           onClick={() => onChangeActiveTool("iconColor")}
         />
         <SidebarItem
-          icon={Palette}
+          icon={LayoutTemplate}
           label="Layout"
           isActive={activeTool === "layout"}
           onClick={() => onChangeActiveTool("layout")}

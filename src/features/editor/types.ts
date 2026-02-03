@@ -108,6 +108,7 @@ export type ActiveTool =
   | "stroke-width"
   | "font"
   | "effects"
+  | "font-spacing"  
   | "opacity"
   | "filter"
   | "settings"
@@ -303,6 +304,17 @@ export interface Editor {
     color: string
   ) => void;
   applyLogoLayout: (layout: LogoLayoutId) => void;
-  chnageTextSpacing: (spacing: number) => void;
+  chnageTextSpacing: (value: number) => void;
+  changeCharSpacing: (value: number) => void;
+  changeLineHeight: (value: number) => void;
+  toLowerCase: () => void;
+  toUpperCase: () => void;
   getTextSpacing: () => number;
+  getActiveLineHeight: () => number;
+  getActiveCharSpacing: () => number;
+  getActiveText: () => string;
+  changeText:(value: string) => void;
+
+  
+
 };

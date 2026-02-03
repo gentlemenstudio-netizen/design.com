@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 interface ToolbarProps {
   editor: Editor | undefined;
@@ -369,23 +370,7 @@ export const Toolbar = ({
             onChange={onChangeFontSize}
           />
         </div>
-      )}
-      {isText && (
-        <div className="flex items-center h-full justify-center">
-          <Hint label="Change Case" side="bottom" sideOffset={5}>
-            <Button
-              onClick={() => editor?.changeTextCase()}
-              size="icon"
-              variant="ghost"
-              className={cn(
-                activeTool === "effects" && "bg-gray-100"
-              )}
-            >
-              Aa
-            </Button>
-          </Hint>
-        </div>
-      )}
+      )}      
       {isText && (
         <div className="flex items-center h-full justify-center">
           <Hint label="Effects" side="bottom" sideOffset={5}>
@@ -402,21 +387,80 @@ export const Toolbar = ({
           </Hint>
         </div>
       )}
-      <div className="flex items-center h-full justify-center ">
-        <Hint label="Effects" side="bottom" sideOffset={5}>
+     
+      <div className="flex items-center h-full justify-center">
+  <Popover>
+    <PopoverTrigger asChild>
+      <Button
+        size="icon"
+        variant="ghost"
+        className={cn(activeTool === "font-spacing" && "bg-gray-100")}
+      >
+        <SquareSplitHorizontal className="size-4" />
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent side="bottom" align="start" sideOffset={10}>
+      <div className="space-y-4">
+        {/* Letter Spacing */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <label className="text-[10px] font-bold uppercase text-slate-500">Letter Spacing</label>
+            <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">
+              {editor?.getActiveCharSpacing() ?? 0}
+            </span>
+          </div>
           <Slider
-            min={-200}
-            max={600}
-            step={5}
-            value={[properties.textSpacing]}
-            onValueChange={(e) => {
-              onChangeTextSpacing(Number(e[0]));
-            }}
-            className="w-[100px]"
+            value={[editor?.getActiveCharSpacing() ?? 0]}
+            onValueChange={(values) => editor?.changeCharSpacing(values[0])}
+            max={500}
+            min={-50}
+            step={1}
           />
-        </Hint>
-      </div>
+        </div>
 
+        {/* Line Height */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <label className="text-[10px] font-bold uppercase text-slate-500">Line Height</label>
+            <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">
+              {(editor?.getActiveLineHeight() ?? 1).toFixed(2)}
+            </span>
+          </div>
+          <Slider
+            value={[editor?.getActiveLineHeight() ?? 1]}
+            onValueChange={(values) => editor?.changeLineHeight(values[0])}
+            max={3}
+            min={0.5}
+            step={0.1}
+          />
+        </div>
+      </div>
+    </PopoverContent>
+  </Popover>
+</div>
+{/* Change Case Button */}
+<div className="flex items-center h-full justify-center">
+  <Hint label="Change Case" side="bottom" sideOffset={5}>
+    <Button
+      onClick={() => {
+        const currentText = editor?.getActiveText() || "";
+        // Simple cycle logic: Lower -> Upper -> Sentence
+        if (currentText === currentText.toUpperCase()) {
+          editor?.changeText(currentText.toLowerCase());
+        } else if (currentText === currentText.toLowerCase()) {
+          const sentence = currentText.charAt(0).toUpperCase() + currentText.slice(1);
+          editor?.changeText(sentence);
+        } else {
+          editor?.changeText(currentText.toUpperCase());
+        }
+      }}
+      size="icon"
+      variant="ghost"
+    >
+      <span className="text-sm font-bold tracking-tighter">Aa</span>
+    </Button>
+  </Hint>
+</div>
       {isImage && (
         <div className="flex items-center h-full justify-center">
           <Hint label="Filters" side="bottom" sideOffset={5}>

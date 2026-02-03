@@ -1,116 +1,112 @@
 "use client";
 
+import { useEffect, useState, useMemo } from "react";
 import { HexColorPicker } from "react-colorful";
 import { Editor } from "../types";
-import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ToolSidebarHeader } from "./tool-sidebar-header";
+import { ToolSidebarClose } from "./tool-sidebar-close";
 
-const DEFAULT_COLORS = [
-    "#000000", "#4B4B4B", "#9E9E9E", "#E0E0E0", "#FFFFFF",
-    "#FF5252", "#FF80AB", "#7C4DFF", "#448AFF",
-    "#40C4FF", "#69F0AE", "#FFD740",
-];
-
-const GRADIENTS = [
-    ["#ff9966", "#ff5e62"],
-    ["#36d1dc", "#5b86e5"],
-    ["#7F00FF", "#E100FF"],
-    ["#56ab2f", "#a8e063"],
+const FRESH_COLORS = [
+    "#F8FAFC", "#000000", "#6366F1", "#8B5CF6", "#EC4899", 
+    "#EF4444", "#F59E0B", "#10B981", "#06B6D4", "#3B82F6",
+    "#1E293B", "#71717A"
 ];
 
 interface Props {
     editor: Editor | undefined;
     activeTool: string;
-    onChangeActiveTool: (tool: any) => void;
+    onClose: () => void;
 }
 
+export const BackgroundSidebar = ({ editor, activeTool, onClose }: Props) => {
+    const [color, setColor] = useState("#ffffff");
 
-export const BackgroundSidebar = ({ editor, activeTool }: Props) => {
+    // 1. Sync state with actual workspace color on open
+    useEffect(() => {
+        if (activeTool === "bgcolor") {
+            const workspace = editor?.getWorkspace();
+            if (workspace) {
+                setColor(workspace.fill as string || "#ffffff");
+            }
+        }
+    }, [activeTool, editor]);
 
-    const workspace = editor?.getWorkspace();
+    // 2. Extract unique colors from current logo objects (Logo Colors)
+    const logoColors = useMemo(() => {
+        if (!editor?.canvas) return [];
+        const objects = editor.canvas.getObjects();
+        const colors = new Set<string>();
 
-    const [customColor, setCustomColor] = useState(workspace?.backgroundColor || "#000000");
+        objects.forEach((obj) => {
+            if (obj.name === "clip") return; // Ignore workspace background
+            if (typeof obj.fill === "string") colors.add(obj.fill);
+            if (typeof obj.stroke === "string") colors.add(obj.stroke);
+        });
+
+        return Array.from(colors).filter(c => c && c !== "transparent").slice(0, 6);
+    }, [editor?.canvas, activeTool]);
 
     if (activeTool !== "bgcolor" || !editor) return null;
 
-
-
-    const applyColor = (color: string) => {
-        editor.changeBackground(color);
-    };
-
-    // const applyGradient = (colors: string[]) => {
-    //     const gradient = new fabric.Gradient({
-    //         type: "linear",
-    //         gradientUnits: "percentage",
-    //         coords: { x1: 0, y1: 0, x2: 0, y2: 1 },
-    //         colorStops: colors.map((c, i) => ({
-    //             offset: i / (colors.length - 1),
-    //             color: c,
-    //         })),
-    //     });
-
-    //     // editor.changeBackground(gradient);
-    //     //editor.changeBackground(""); // Force re-render
-    // };
-
-    const clearBackground = () => {
-        editor.changeBackground("");
+    const handleColorChange = (value: string) => {
+        setColor(value);
+        editor.changeBackground(value);
     };
 
     return (
-        <div className="p-4 space-y-4">
-            <h3 className="font-semibold">Edit Background</h3>
-
-            {/* New Color */}
-            <div>
-                <p className="text-sm mb-2">New color</p>
-                <HexColorPicker color={customColor} onChange={setCustomColor} />
-                <button
-                    className="mt-2 w-full rounded border p-2"
-                    onClick={() => applyColor(customColor)}
-                >
-                    Add color
-                </button>
-            </div>
-
-            {/* Default Colors */}
-            <div>
-                <p className="text-sm mb-2">Default colors</p>
-                <div className="grid grid-cols-6 gap-2">
-                    {DEFAULT_COLORS.map((c) => (
-                        <button
-                            key={c}
-                            onClick={() => applyColor(c)}
-                            className="h-8 w-8 rounded"
-                            style={{ backgroundColor: c }}
+        <aside className="bg-white relative z-[40] w-[360px] h-full flex flex-col border-r">
+            <ToolSidebarHeader 
+                title="Background" 
+                description="Change the background color of your project" 
+            />
+            
+            <ScrollArea className="flex-1 px-4">
+                <div className="py-6 space-y-6">
+                    {/* Custom Picker - Immediate Apply */}
+                    <div className="space-y-4">
+                        <HexColorPicker 
+                            color={color} 
+                            onChange={handleColorChange} 
+                            className="!w-full"
                         />
-                    ))}
-                </div>
-            </div>
+                    </div>
 
-            {/* Gradient Colors */}
-            {/* <div>
-                <p className="text-sm mb-2">Gradient colors</p>
-                <div className="grid grid-cols-5 gap-2">
-                    {GRADIENTS.map((g, i) => (
-                        <button
-                            key={i}
-                            onClick={() => applyGradient(g)}
-                            className="h-10 w-10 rounded"
-                            style={{
-                                background: `linear-gradient(${g.join(",")})`,
-                            }}
-                        />
-                    ))}
-                </div>
-            </div> */}
+                    {/* Logo/Document Colors (Extracted from your logo) */}
+                    {logoColors.length > 0 && (
+                        <div className="space-y-2">
+                            <p className="text-xs font-bold uppercase text-slate-500">Logo Colors</p>
+                            <div className="flex flex-wrap gap-2">
+                                {logoColors.map((c) => (
+                                    <button
+                                        key={c}
+                                        onClick={() => handleColorChange(c)}
+                                        className="h-8 w-8 rounded-full border border-slate-200 shadow-sm"
+                                        style={{ backgroundColor: c }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
-            <button
-                className="w-full border rounded py-2"
-            // onClick={() => editor.clearBackground()}
-            >
-                Clear background
-            </button>
-        </div>
+                    {/* Fresh Default Colors */}
+                    <div className="space-y-2">
+                        <p className="text-xs font-bold uppercase text-slate-500">Fresh Palette</p>
+                        <div className="grid grid-cols-6 gap-2">
+                            {FRESH_COLORS.map((c) => (
+                                <button
+                                    key={c}
+                                    onClick={() => handleColorChange(c)}
+                                    className="h-8 w-8 rounded-md hover:scale-110 transition border border-slate-100"
+                                    style={{ backgroundColor: c }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </ScrollArea>
+            
+            <ToolSidebarClose onClick={onClose} />
+        </aside>
     );
-}
+};

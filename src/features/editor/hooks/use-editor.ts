@@ -649,7 +649,77 @@ const buildEditor = ({
         }
       });
       canvas.renderAll();
-    },
+      save();
+      },
+      changeCharSpacing: (value: number) => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      // Fabric uses values where 100 = 1 letter width. 
+      // Most tools use a 0-based scale where 0 is normal.
+      (selectedObject as fabric.IText).set("charSpacing", value);
+      canvas.renderAll();
+      save();
+    }
+  },
+
+  changeLineHeight: (value: number) => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      (selectedObject as fabric.IText).set("lineHeight", value);
+      canvas.renderAll();
+      save();
+    }
+  },
+
+  toUpperCase: () => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      const text = (selectedObject as fabric.IText).text || "";
+      (selectedObject as fabric.IText).set("text", text.toUpperCase());
+      canvas.renderAll();
+      save();
+    }
+  },
+
+  toLowerCase: () => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      const text = (selectedObject as fabric.IText).text || "";
+      (selectedObject as fabric.IText).set("text", text.toLowerCase());
+      canvas.renderAll();
+      save();
+    }
+  },
+      // Add these to your Editor return object in use-editor.ts
+  getActiveLineHeight: () => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      return (selectedObject as fabric.IText).lineHeight || 1;
+    }
+    return 1;
+  },
+  getActiveCharSpacing: () => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      return (selectedObject as fabric.IText).charSpacing || 0;
+    }
+    return 0;
+  },
+  getActiveText: () => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      return (selectedObject as fabric.IText).text || "";
+    }
+    return "";
+  },
+  changeText: (value: string) => {
+    const selectedObject = canvas.getActiveObject();
+    if (isTextType(selectedObject?.type)) {
+      (selectedObject as fabric.IText).set("text", value);
+      canvas.renderAll();
+      save();
+    }
+  },
     getTextSpacing: () => {
       const selectedObject = selectedObjects[0];
 
@@ -662,12 +732,15 @@ const buildEditor = ({
       const value = selectedObject.get("charSpacing") || 100;
 
       return value;
-    },
+        },
+        // Inside use-editor.ts -> buildEditor
     changeBackground: (value: string) => {
-      const workspace = getWorkspace();
-      workspace?.set({ fill: value });
-      canvas.renderAll();
-      save();
+      const workspace = getWorkspace(); // Helper that finds the 'clip' object
+      if (workspace) {
+        workspace.set({ fill: value });
+        canvas.renderAll();
+        save(); // Push to history so user can Undo/Redo color changes
+      }
     },
     enableDrawingMode: () => {
       canvas.discardActiveObject();
