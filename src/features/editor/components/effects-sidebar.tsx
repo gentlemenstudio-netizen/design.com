@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Editor, TextEffects } from "@/features/editor/types";
+import { ActiveTool, Editor, TextEffects } from "@/features/editor/types";
 import { ToolSidebarClose } from "./tool-sidebar-close";
 import { ToolSidebarHeader } from "./tool-sidebar-header";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,12 +13,14 @@ import { cn } from "@/lib/utils";
 interface EffectsSidebarProps {
     editor: Editor | undefined;
     activeTool: string;
+    onChangeActiveTool: (tool: ActiveTool) => void; // Add this line
     onClose: () => void;
 }
 
 export const EffectsSidebar = ({
     editor,
     activeTool,
+    onChangeActiveTool, // Destructure it here
     onClose,
 }: EffectsSidebarProps) => {
     // Drop Shadow States
