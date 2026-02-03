@@ -210,6 +210,7 @@ export const Editor = ({ initialData, mode }: EditorProps) => {
         <EffectsSidebar
           editor={editor}
           activeTool={activeTool}
+          onClose={() => onChangeActiveTool("select")} // Add this line
           onChangeActiveTool={onChangeActiveTool}
         />
         <IconColorSidebar
@@ -226,6 +227,7 @@ export const Editor = ({ initialData, mode }: EditorProps) => {
           editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}
+          onClose={() => onChangeActiveTool("select")}
         />
         <main className="bg-muted flex-1 overflow-auto relative flex flex-col">
           <Toolbar

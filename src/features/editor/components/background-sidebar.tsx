@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { HexColorPicker } from "react-colorful";
-import { Editor } from "../types";
+import { ActiveTool, Editor } from "../types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToolSidebarHeader } from "./tool-sidebar-header";
 import { ToolSidebarClose } from "./tool-sidebar-close";
@@ -16,10 +16,11 @@ const FRESH_COLORS = [
 interface Props {
     editor: Editor | undefined;
     activeTool: string;
+    onChangeActiveTool: (tool: ActiveTool) => void; // Add this line
     onClose: () => void;
 }
 
-export const BackgroundSidebar = ({ editor, activeTool, onClose }: Props) => {
+export const BackgroundSidebar = ({ editor, activeTool, onChangeActiveTool, onClose }: Props) => {
     const [color, setColor] = useState("#ffffff");
 
     // 1. Sync state with actual workspace color on open
