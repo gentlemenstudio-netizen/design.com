@@ -391,51 +391,64 @@ export const Toolbar = ({
       <div className="flex items-center h-full justify-center">
   <Popover>
     <PopoverTrigger asChild>
-      <Button
-        size="icon"
-        variant="ghost"
-        className={cn(activeTool === "font-spacing" && "bg-gray-100")}
-      >
-        <SquareSplitHorizontal className="size-4" />
-      </Button>
-    </PopoverTrigger>
-    <PopoverContent side="bottom" align="start" sideOffset={10}>
-      <div className="space-y-4">
-        {/* Letter Spacing */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-[10px] font-bold uppercase text-slate-500">Letter Spacing</label>
-            <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">
-              {editor?.getActiveCharSpacing() ?? 0}
-            </span>
-          </div>
-          <Slider
-            value={[editor?.getActiveCharSpacing() ?? 0]}
-            onValueChange={(values) => editor?.changeCharSpacing(values[0])}
-            max={500}
-            min={-50}
-            step={1}
-          />
+    <Button
+      size="icon"
+      variant="ghost"
+      className={cn(activeTool === "font-spacing" && "bg-gray-100")}
+    >
+      <SquareSplitHorizontal className="size-4" />
+    </Button>
+  </PopoverTrigger>
+    <PopoverContent 
+    side="bottom" 
+    align="start" 
+    sideOffset={10}
+    // 🔑 ADD THESE TWO PROPS TO PREVENT AUTO-CLOSING
+    onPointerDownOutside={(e) => {
+      // Prevent closing if the user is clicking/dragging the slider thumb
+      if (e.target instanceof Element && e.target.closest("[role='slider']")) {
+        e.preventDefault();
+      }
+    }}
+  >
+    <div className="space-y-4">
+      {/* Letter Spacing */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <label className="text-[10px] font-bold uppercase text-slate-500">Letter Spacing</label>
+          <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">
+            {editor?.getActiveCharSpacing() ?? 0}
+          </span>
         </div>
-
-        {/* Line Height */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-[10px] font-bold uppercase text-slate-500">Line Height</label>
-            <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">
-              {(editor?.getActiveLineHeight() ?? 1).toFixed(2)}
-            </span>
-          </div>
-          <Slider
-            value={[editor?.getActiveLineHeight() ?? 1]}
-            onValueChange={(values) => editor?.changeLineHeight(values[0])}
-            max={3}
-            min={0.5}
-            step={0.1}
-          />
-        </div>
+        <Slider
+          // Use value instead of defaultValue to keep it controlled
+          value={[editor?.getActiveCharSpacing() ?? 0]}
+          onValueChange={(values) => editor?.changeCharSpacing(values[0])}
+          max={500}
+          min={-50}
+          step={1}
+        />
       </div>
-    </PopoverContent>
+
+      {/* Line Height */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <label className="text-[10px] font-bold uppercase text-slate-500">Line Height</label>
+          <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">
+            {(editor?.getActiveLineHeight() ?? 1).toFixed(2)}
+          </span>
+        </div>
+        <Slider
+          value={[editor?.getActiveLineHeight() ?? 1]}
+          onValueChange={(values) => editor?.changeLineHeight(values[0])}
+          max={3}
+          min={0.5}
+          step={0.1}
+        />
+      </div>
+    </div>  
+  
+  </PopoverContent>
   </Popover>
 </div>
 {/* Change Case Button */}

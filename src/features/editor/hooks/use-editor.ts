@@ -227,62 +227,59 @@ const buildEditor = ({
   };
 
   const getIconColors = (): string[] => {
-    const active = canvas.getActiveObject();
+    // Priority 1: Current Selection
+  // Priority 2: Any Group/SVG on canvas if nothing is selected
+  const activeObject = canvas.getActiveObject();
+  const target = activeObject || canvas.getObjects().find(obj => obj.type === 'group' || obj.type === 'path');
 
-    if (!active || active.type !== "group") return [];
+  if (!target) return [];
 
-    const group = active as fabric.Group;
-    const objects = getGroupObjects(group);
-
-    const colors = new Set<string>();
-
-    objects.forEach(obj => {
-      if (typeof obj.fill === "string") {
-        colors.add(normalizeColor(obj.fill));
+  const colors = new Set<string>();
+  
+  // Recursively find fills in groups
+  const extractColors = (obj: any) => {
+    if (obj._objects) {
+      obj._objects.forEach(extractColors);
+    } else {
+      if (typeof obj.fill === "string" && obj.fill !== "transparent") {
+        colors.add(obj.fill);
       }
-    });
+    }
+  };
 
-    return Array.from(colors);
+  extractColors(target);
+  return Array.from(colors);
   };
 
   const getIconGradients = () => {
-    const group = getActiveLogoGroup();
-    if (!group) return [];
+    const activeObject = canvas.getActiveObject();
+  const target = activeObject || canvas.getObjects().find(obj => obj.type === 'group' || obj.type === 'path');
+  
+  if (!target) return [];
 
-    const gradientMap = new Map<
-      string,
-      {
-        signature: string;
-        paletteIndexes: number[]; // 🔑 all paths using this gradient
-        stops: { offset: number; color: string }[];
-        baseGradient: fabric.Gradient;
+  const gradients: any[] = [];
+  const foundSignatures = new Set();
+
+  const extractGradients = (obj: any) => {
+    if (obj._objects) {
+      obj._objects.forEach(extractGradients);
+    } else {
+      const fill = obj.fill;
+      if (fill && typeof fill === "object" && fill.colorStops) {
+        const signature = fill.colorStops.map((s: any) => s.color).join(",");
+        if (!foundSignatures.has(signature)) {
+          foundSignatures.add(signature);
+          gradients.push({
+            signature,
+            stops: fill.colorStops
+          });
+        }
       }
-    >();
+    }
+  };
 
-    group.getObjects().forEach((obj: any) => {
-      if (!obj.fill || typeof obj.fill === "string") return;
-
-      const gradient = obj.fill as fabric.Gradient;
-      if (!gradient.colorStops) return;
-
-      const sig = gradientSignature(gradient);
-
-      if (!gradientMap.has(sig)) {
-        gradientMap.set(sig, {
-          signature: sig,
-          paletteIndexes: [obj.paletteIndex],
-          stops: gradient.colorStops.map(s => ({
-            offset: s.offset,
-            color: s.color,
-          })),
-          baseGradient: gradient,
-        });
-      } else {
-        gradientMap.get(sig)!.paletteIndexes.push(obj.paletteIndex);
-      }
-    });
-
-    return Array.from(gradientMap.values());
+  extractGradients(target);
+  return gradients;
   };
 
 
@@ -291,31 +288,35 @@ const buildEditor = ({
     stopIndex: number,
     color: string
   ) => {
-    const group = getActiveLogoGroup();
-    if (!group) return;
+   const activeObject = canvas.getActiveObject();
+  const target = activeObject || canvas.getObjects().find(obj => obj.type === 'group' || obj.type === 'path');
 
-    group.getObjects().forEach((obj: any) => {
-      if (!obj.fill || typeof obj.fill === "string") return;
+  if (!target) return;
 
-      const gradient = obj.fill as fabric.Gradient;
-      if (!gradient.colorStops) return;
+  const recurseGradient = (obj: any) => {
+    if (obj._objects) {
+      obj._objects.forEach(recurseGradient);
+    } else {
+      const fill = obj.fill;
+      // Check if it's a gradient
+      if (fill && typeof fill === "object" && fill.colorStops) {
+        const currentSig = fill.colorStops.map((s: any) => s.color).join(",");
+        
+        if (currentSig === signature) {
+          // Update the specific stop
+          fill.colorStops[stopIndex].color = color;
+          
+          // IMPORTANT: Fabric.js needs to know the object is "dirty" 
+          // to re-render the gradient cache
+          obj.set("dirty", true);
+        }
+      }
+    }
+  };
 
-      if (gradientSignature(gradient) !== signature) return;
-
-      const newStops = gradient.colorStops.map((stop, i) =>
-        i === stopIndex ? { ...stop, color } : stop
-      );
-
-      const newGradient = new fabric.Gradient({
-        type: gradient.type,
-        coords: gradient.coords,
-        colorStops: newStops,
-      });
-
-      obj.set("fill", newGradient);
-    });
-
-    canvas.requestRenderAll();
+  recurseGradient(target);
+  canvas.renderAll();
+  save();
   };
 
 
@@ -328,25 +329,25 @@ const buildEditor = ({
     return active as fabric.Group;
   };
   const replaceIconColor = (oldColor: string, newColor: string) => {
-    const active = canvas.getActiveObject();
+   const activeObject = canvas.getActiveObject();
+  // If nothing selected, find the first group/path on canvas
+  const target = activeObject || canvas.getObjects().find(obj => obj.type === 'group' || obj.type === 'path');
 
-    if (!active || active.type !== "group") return;
+  if (!target) return;
 
-    const group = active as fabric.Group;
-    const objects = getGroupObjects(group);
+  const recurseReplace = (obj: any) => {
+    if (obj._objects) {
+      obj._objects.forEach(recurseReplace);
+    } else {
+      // Check fill and stroke
+      if (obj.fill === oldColor) obj.set("fill", newColor);
+      if (obj.stroke === oldColor) obj.set("stroke", newColor);
+    }
+  };
 
-    const normalizedOld = normalizeColor(oldColor);
-
-    objects.forEach(obj => {
-      if (
-        typeof obj.fill === "string" &&
-        normalizeColor(obj.fill) === normalizedOld
-      ) {
-        obj.set("fill", newColor);
-      }
-    });
-
-    canvas.requestRenderAll();
+  recurseReplace(target);
+  canvas.renderAll();
+  save(); // Save to history so Niranjan can undo
   };
 
 
