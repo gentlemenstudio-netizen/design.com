@@ -90,9 +90,7 @@ export const TemplatePreview = ({
                 // 🔑 Keep only logo-relevant objects
                 const objects = allObjects.filter((obj: any) => {
                     if(obj.customRole == "brand") 
-                        {
-                        console.log("resizing brand name");
-                        console.log({obj});
+                        {                        
                         //obj.set({width: width}); // Force re-wrap
                         if(obj.height > 100) {                            
                             obj.set({fontSize: obj.fontSize * 100 / obj.height});
