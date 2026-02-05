@@ -37,6 +37,15 @@ import { LOGO_LAYOUT_RECIPES } from "../layout/logo-layout.recipes";
 import { LogoLayoutId } from "../layout/logo-layout.types";
 import { patchCanvasTextBaseline } from "@/lib/patch-canvas-textbaseline";
 
+
+// This tells TS to merge your custom property into the existing Textbox type
+declare module "fabric" {
+  namespace fabric {
+    interface Textbox {
+      fixedHeight?: number;
+    }
+  }
+}
 const buildEditor = ({
   save,
   undo,
@@ -792,11 +801,68 @@ const buildEditor = ({
       canvas.discardActiveObject();
       canvas.renderAll();
     },
+// addText: (value, options, role = "") => {
+//   const PADDING_BUFFER = 20; // Distance from the canvas edge
+//   const artboard = getArtboard(canvas);
+//     if (!artboard) return;
+    
+//     const { cx, cy, width: aw, height: ah } = artboard;
+//   const object = new fabric.Textbox(value, {
+//     ...TEXT_OPTIONS,
+//     fill: fillColor,
+//     width: options?.width ?? 200,
+//     fontSize: options?.fontSize ?? 40,
+//     splitByGrapheme: false, // Disables breaking words into new lines
+//     ...options,
+//   });
+
+//   if (role) {
+//     object.customRole = role;
+//   }
+
+//   const fitText = () => {
+//    // const canvasWidth = object.canvas?.width ?? 800;
+   
+// const maxAllowedWidth = aw + 550 - PADDING_BUFFER; 
+ 
+//     // 2. Expand width to fit text as you type
+//     // We measure the text and update the box width so it doesn't wrap
+//     const actualTextWidth = object.getLineWidth(0) + 2 > maxAllowedWidth ? maxAllowedWidth : object.getLineWidth(0) + 2;
+//     object.set("width", actualTextWidth + 2); // +2 for cursor breathing room
+
+//     // 3. CANVAS BOUNDARY CHECK:
+//     // If the box hits the canvas edge (minus buffer), start shrinking the font
+//     // and lock the width to the boundary
+//     const rightEdge = object.left! + object.width!;
+       
+//     if (rightEdge > maxAllowedWidth) {
+//       // Lock width to the edge
+//       object.set("width", maxAllowedWidth - object.left!);
+      
+//       // Shrink font until it fits within that locked width
+//     //  while (object.getLineWidth(0) > object.width! && object.fontSize! > 5) {
+//         object.set("fontSize", object.fontSize! - 1);
+//         object.initDimensions();
+//          object.canvas?.renderAll();
+//     //  }
+//     }
+
+//     object.canvas?.renderAll();
+//   };
+
+//   object.on('changed', fitText);
+  
+//   // Also run when the object is moved so it shrinks if dragged toward the edge
+//   object.on('moving', fitText);
+
+//   addToCanvas(object);
+//   fitText(); // Initial check
+// },
     addText: (value, options, role = "") => {
       const object = new fabric.Textbox(value, {
         ...TEXT_OPTIONS,
         fill: fillColor,
-        ...options,
+        ...options
       });
 
       if (role) {
