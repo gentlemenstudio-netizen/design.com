@@ -114,6 +114,7 @@ export const TemplatePreview = ({
             selectable: false, 
             shadow: brandData.shadow ? new fabric.Shadow(brandData.shadow) : undefined,
             stroke: brandData.stroke ? brandData.stroke : undefined,
+            strokeWidth: brandData.strokeWidth || 0,
             evented: false,
             lockMovementX: true, // Extra safety
             lockMovementY: true,
@@ -148,6 +149,7 @@ export const TemplatePreview = ({
                 selectable: false,
                 shadow: taglineData.shadow ? new fabric.Shadow(taglineData.shadow) : undefined,
                 stroke: taglineData.stroke ? taglineData.stroke : undefined,
+                strokeWidth: taglineData.strokeWidth || 0,
                 evented: false,
             });
 
