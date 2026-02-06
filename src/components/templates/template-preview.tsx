@@ -69,6 +69,8 @@ export const TemplatePreview = ({
                     top: currentTop,
                     originX: "center",
                     originY: "top",
+                    selectable: false, // Prevents selection
+                    evented: false, // Prevents any events (like hover) from affecting the logo 
                 });
 
                 // Increase logo size (50% of card height)
@@ -109,6 +111,10 @@ export const TemplatePreview = ({
             textAlign: "center",
             width: width - (PADDING * 2), // Set the boundary
             splitByGrapheme: false, // Prevents breaking words in the middle
+            selectable: false, 
+            evented: false,
+            lockMovementX: true, // Extra safety
+            lockMovementY: true,
         });
 
         // 2. Shrink Font to stay on one line
@@ -128,14 +134,17 @@ export const TemplatePreview = ({
             const brandBottom = brand.getBoundingRect().top + brand.getBoundingRect().height;
             const tagline = new fabric.Textbox(taglineData.text || "", {
                 left: CENTER_X,
-                top: brandBottom + 2,
+                top: brandBottom -5,
                 originX: "center",
                 originY: "top",
-                fontSize: 18,
+                fontSize: 16,
                 fontFamily: taglineData.fontFamily || "Arial",
                 fill: taglineData.fill || "#666666",
                 textAlign: "center",
                 width: width - PADDING * 2,
+                charSpacing:taglineData.charSpacing || 0,
+                selectable: false,
+                evented: false,
             });
 
             let currentTaglineSize = 12;
@@ -157,7 +166,8 @@ export const TemplatePreview = ({
         if (!canvasRef.current) return;
         const canvas = new fabric.Canvas(canvasRef.current, {
             selection: false,
-            interactive: false,
+            interactive: false,  // Disables all mouse interaction
+            hoverCursor: "default"
         });
         fabricRef.current = canvas;
         return () => {
