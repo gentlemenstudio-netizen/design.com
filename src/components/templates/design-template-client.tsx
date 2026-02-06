@@ -105,7 +105,7 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
                 {templates.map((template) => {
                     const previewJson = injectTemplateVariables(template.json, {
                         BRAND_NAME: initialBrand.toUpperCase() || "LOGOTEXT",
-                        TAGLINE: initialTagline.toUpperCase() || "SLOGANHERE"
+                        TAGLINE: initialTagline.toUpperCase() || "SLOGAN HERE"
                     });
 
                     return (
