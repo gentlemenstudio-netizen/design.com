@@ -22,6 +22,23 @@ interface Props {
 
 export const BackgroundSidebar = ({ editor, activeTool, onChangeActiveTool, onClose }: Props) => {
     const [color, setColor] = useState("#ffffff");
+    // Inside BackgroundSidebar component
+    const [inputValue, setInputValue] = useState(color);
+
+    // Update local input when color changes from picker or useEffect
+    useEffect(() => {
+        setInputValue(color);
+    }, [color]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setInputValue(val);
+        
+        // Validate if it's a correct hex code before applying
+        if (/^#([0-9A-F]{3}){1,2}$/i.test(val)) {
+            handleColorChange(val);
+        }
+    };
 
     // 1. Sync state with actual workspace color on open
     useEffect(() => {
@@ -65,12 +82,23 @@ export const BackgroundSidebar = ({ editor, activeTool, onChangeActiveTool, onCl
             <ScrollArea className="flex-1 px-4">
                 <div className="py-6 space-y-6">
                     {/* Custom Picker - Immediate Apply */}
-                    <div className="space-y-4">
-                        <HexColorPicker 
-                            color={color} 
-                            onChange={handleColorChange} 
-                            className="!w-full"
-                        />
+                    <div className="space-y-4">                       
+                        <div className="space-y-4">
+                            <HexColorPicker 
+                                color={color} 
+                                onChange={handleColorChange} 
+                                className="!w-full"
+                            />
+                            <div className="flex items-center gap-x-2">
+                                <div className="text-xs font-medium text-slate-500 bg-slate-100 p-2 rounded-l-md border-y border-l">HEX</div>
+                                <input 
+                                    value={inputValue}
+                                    onChange={handleInputChange}
+                                    className="flex-1 border p-1.5 text-sm uppercase rounded-r-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                    placeholder="#FFFFFF"
+                                />
+                            </div>
+                        </div>                      
                     </div>
 
                     {/* Logo/Document Colors (Extracted from your logo) */}
