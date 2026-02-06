@@ -112,6 +112,8 @@ export const TemplatePreview = ({
             width: width - (PADDING * 2), // Set the boundary
             splitByGrapheme: false, // Prevents breaking words in the middle
             selectable: false, 
+            shadow: brandData.shadow ? new fabric.Shadow(brandData.shadow) : undefined,
+            stroke: brandData.stroke ? brandData.stroke : undefined,
             evented: false,
             lockMovementX: true, // Extra safety
             lockMovementY: true,
@@ -144,6 +146,8 @@ export const TemplatePreview = ({
                 width: width - PADDING * 2,
                 charSpacing:taglineData.charSpacing || 0,
                 selectable: false,
+                shadow: taglineData.shadow ? new fabric.Shadow(taglineData.shadow) : undefined,
+                stroke: taglineData.stroke ? taglineData.stroke : undefined,
                 evented: false,
             });
 
