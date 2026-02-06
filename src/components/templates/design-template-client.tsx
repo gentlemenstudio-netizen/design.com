@@ -60,7 +60,7 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
         // ... (Keep existing POST logic to /api/projects)
         const injectedJson = injectTemplateVariables(template.json, {
             BRAND_NAME: initialBrand.toUpperCase() || "LOGOTEXT",
-            TAGLINE: initialTagline.toUpperCase() || "SLOGANHERE",
+            TAGLINE: initialTagline.toUpperCase() || "SLOGAN HERE",
         });
 
         const res = await fetch("/api/projects", {

@@ -3,11 +3,9 @@
 import { fabric } from "fabric";
 import { useEffect, useRef, useState } from "react";
 import { loadCanvasFonts } from "@/lib/load-canvas-fonts";
-
 import { patchCanvasTextBaseline } from "@/lib/patch-canvas-textbaseline";
 
 patchCanvasTextBaseline();
-
 
 interface TemplatePreviewProps {
     json: any;
@@ -30,178 +28,174 @@ export const TemplatePreview = ({
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const fabricRef = useRef<fabric.Canvas | null>(null);
     const [ready, setReady] = useState(false);
-    const hasReportedLoaded = useRef(false);
-    useEffect(() => {
-        hasReportedLoaded.current = false;
-    }, [json]);
 
+    const renderManually = async () => {
+        const canvas = fabricRef.current;
+        const container = containerRef.current;
+        
+        if (!canvas || !container || !json?.objects) return;
 
-    /* =========================
-       INIT CANVAS (ONCE)
-    ========================= */
-    useEffect(() => {
-        let mounted = true;
+        const width = container.offsetWidth;
+        const height = container.offsetHeight;
+        const CENTER_X = width / 2;
+        const PADDING = 24; // Side padding
 
-        const init = async () => {
-            if (!canvasRef.current) return;
+        canvas.setWidth(width);
+        canvas.setHeight(height);
+        canvas.clear();
 
-            await loadCanvasFonts();
-            if (!mounted) return;
+        const rawObjects = json.objects as any[];
+        const logoData = rawObjects.find(o => o.customType === "logoIcon");
+        const brandData = rawObjects.find(o => o.customRole === "brand");
+        const taglineData = rawObjects.find(o => o.customRole === "tagline");
+        const backgroundData = rawObjects.find(o => o.type === "rect" || o.name === "clip");
 
-            fabricRef.current = new fabric.Canvas(canvasRef.current, {
-                selection: false,
-                skipTargetFind: true,
-                renderOnAddRemove: false,
+        if (backgroundData?.fill) {
+            container.style.backgroundColor = backgroundData.fill;
+        }
+
+        let currentTop = 30; // Start a bit lower
+
+        // 1. Render Logo
+        if (logoData) {
+            fabric.util.enlivenObjects([logoData], (enlivened: fabric.Object[]) => {
+                const logo = enlivened[0];
+                const currentCanvas = fabricRef.current;
+                if (!logo || !currentCanvas) return;
+
+                // Center the internal origin
+                logo.set({
+                    left: CENTER_X,
+                    top: currentTop,
+                    originX: "center",
+                    originY: "top",
+                });
+
+                // Increase logo size (50% of card height)
+                logo.scaleToHeight(height * 0.48);
+                
+                // If it's too wide, scale to width
+                if (logo.getBoundingRect().width > width - PADDING * 2) {
+                    logo.scaleToWidth(width - PADDING * 2);
+                }
+
+                currentCanvas.add(logo);
+                currentCanvas.renderAll();
+
+                const logoBottom = logo.getBoundingRect().top + logo.getBoundingRect().height;
+                renderTextElements(logoBottom + 5);
+            }, "");
+        } else {
+            renderTextElements(currentTop + 40);
+        }
+
+        // 2. Render Text with Auto-Size
+        function renderTextElements(topPos: number) {
+    const currentCanvas = fabricRef.current;
+    if (!currentCanvas) return;
+
+    if (brandData) {
+        // 1. Create the Brand Textbox
+        const brand = new fabric.Textbox(brandData.text || "BRAND", {
+            left: CENTER_X,
+            top: topPos,
+            originX: "center",
+            originY: "top",
+            fontSize: 42, 
+            lineHeight: 0.9,
+            fontFamily: brandData.fontFamily || "Arial",
+            fill: brandData.fill || "#000000",
+            fontWeight: brandData.fontWeight || "bold",
+            textAlign: "center",
+            width: width - (PADDING * 2), // Set the boundary
+            splitByGrapheme: false, // Prevents breaking words in the middle
+        });
+
+        // 2. Shrink Font to stay on one line
+        // We use measureLine(0).width to see how long the actual text is
+        let currentBrandSize = brand.fontSize || 40;
+        while (brand.measureLine(0).width > (width - PADDING * 2.5) && currentBrandSize > 8) {
+            currentBrandSize -= 1;
+            brand.set("fontSize", currentBrandSize);
+        }
+        
+        // Final safety: ensure the width of the box is wide enough for the new size
+        brand.set("width", width - PADDING); 
+        currentCanvas.add(brand);
+
+        // 3. Handle Tagline
+        if (taglineData) {
+            const brandBottom = brand.getBoundingRect().top + brand.getBoundingRect().height;
+            const tagline = new fabric.Textbox(taglineData.text || "", {
+                left: CENTER_X,
+                top: brandBottom + 2,
+                originX: "center",
+                originY: "top",
+                fontSize: 18,
+                fontFamily: taglineData.fontFamily || "Arial",
+                fill: taglineData.fill || "#666666",
+                textAlign: "center",
+                width: width - PADDING * 2,
             });
 
-            setReady(true);
-        };
+            let currentTaglineSize = 12;
+            while (tagline.measureLine(0).width > (width - PADDING * 2) && currentTaglineSize > 6) {
+                currentTaglineSize -= 0.5;
+                tagline.set("fontSize", currentTaglineSize);
+            }
+            currentCanvas.add(tagline);
+        }
+    }
 
-        init();
+    currentCanvas.renderAll();
+    setReady(true);
+    onLoaded?.();
+}
+    };
 
+    useEffect(() => {
+        if (!canvasRef.current) return;
+        const canvas = new fabric.Canvas(canvasRef.current, {
+            selection: false,
+            interactive: false,
+        });
+        fabricRef.current = canvas;
         return () => {
-            mounted = false;
-            fabricRef.current?.dispose();
+            canvas.dispose();
             fabricRef.current = null;
         };
     }, []);
 
-    /* =========================
-       RESPONSIVE RENDER
-    ========================= */
     useEffect(() => {
-
-        const canvas = fabricRef.current;
-        const container = containerRef.current;
-        if (!canvas || !container || !ready) return;
-
-        const resizeAndRender = () => {
-            const { width, height } = container.getBoundingClientRect();
-            if (!width || !height) return;
-
-            canvas.setWidth(width);
-            canvas.setHeight(height);
-            canvas.clear();
-            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-            canvas.setZoom(1);
-            canvas.loadFromJSON(json, () => {
-                const allObjects = canvas.getObjects();
-
-                // 🔑 Keep only logo-relevant objects
-                const objects = allObjects.filter((obj: any) => {
-                    if(obj.customRole == "brand") 
-                        {                        
-                        //obj.set({width: width}); // Force re-wrap
-                        if(obj.height > 100) {                            
-                            obj.set({fontSize: obj.fontSize * 100 / obj.height});
-                            
-                        }
-                        //set scale to 1 to avoid issues
-                        //obj.set({fontSize: 30});
-                        obj.set({x: width/2});
-                    }
-                    return (
-                        obj.customType === "logoIcon" ||
-                        obj.customRole === "brandName" ||
-                        obj.customRole === "tagline"
-                    );
-                });
-
-                if (!objects.length) {
-                    canvas.renderAll();
-                    return;
-                }
-
-                // 🔹 Bounding box
-                let minX = Infinity,
-                    minY = Infinity,
-                    maxX = -Infinity,
-                    maxY = -Infinity;
-
-                objects.forEach((obj) => {
-                    const rect = obj.getBoundingRect(true, true);
-                    minX = Math.min(minX, rect.left);
-                    minY = Math.min(minY, rect.top);
-                    maxX = Math.max(maxX, rect.left + rect.width);
-                    maxY = Math.max(maxY, rect.top + rect.height);
-                });
-
-                const contentWidth = maxX - minX;
-                const contentHeight = maxY - minY;
-
-                if (!contentWidth || !contentHeight) return;
-
-                // 🔹 Scale to container
-                const scale = Math.min(
-                    width / contentWidth,
-                    height / contentHeight
-                ) * 0.9; // padding
-
-                canvas.setZoom(scale);
-
-                canvas.absolutePan({
-                    x: minX * scale - (width - contentWidth * scale) / 2,
-                    y: minY * scale - (height - contentHeight * scale) / 2,
-                });
-
-                canvas.renderAll();
-                if (!hasReportedLoaded.current) {
-                    hasReportedLoaded.current = true;
-                    onLoaded?.();
-                }
-
-            });
+        if (!json) return;
+        const init = async () => {
+            await loadCanvasFonts();
+            renderManually();
         };
+        init();
 
-        resizeAndRender();
-
-
-        const observer = new ResizeObserver(resizeAndRender);
-        observer.observe(container);
-
+        const observer = new ResizeObserver(() => renderManually());
+        if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();
-    }, [json, ready]);
+    }, [json]);
 
     return (
-        <div>
+        <div className="group relative">
             <div
                 ref={containerRef}
-                className="
-          relative
-          w-full
-          bg-white
-          border
-          rounded-xl
-          overflow-hidden
-          aspect-[1.24/1]
-        "
+                className="relative w-full border rounded-xl overflow-hidden aspect-[1.24/1] shadow-sm bg-white"
                 onClick={onClick}
             >
-                {!ready && (
-                    <div className="absolute inset-0 bg-muted animate-pulse" />
-                )}
-                <canvas ref={canvasRef} className="absolute inset-0" />
+                {!ready && <div className="absolute inset-0 bg-slate-50 animate-pulse" />}
+                <canvas ref={canvasRef} />
             </div>
 
             {admin && (
-                <div className="mt-2 flex items-center justify-between">
-                    <button
-                        onClick={onEdit}
-                        className="px-3 py-1 text-xs rounded-md bg-primary text-white"
-                    >
-                        Edit
-                    </button>
-                    <button
-                        onClick={onDelete}
-                        className="px-3 py-1 text-xs rounded-md bg-destructive text-white"
-                    >
-                        Delete
-                    </button>
+                <div className="mt-2 flex gap-2">
+                    <button onClick={onEdit} className="flex-1 bg-slate-900 text-white text-[10px] py-2 rounded-lg font-bold">EDIT</button>
+                    <button onClick={onDelete} className="flex-1 bg-rose-50 text-rose-600 text-[10px] py-2 rounded-lg font-bold">DELETE</button>
                 </div>
-
             )}
-
-
         </div>
     );
 };
