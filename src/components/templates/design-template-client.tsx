@@ -75,7 +75,7 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
         });
 
         const result = await res.json();
-        router.push(`/editor/${result.data.id}`);
+        router.push(`/logo-editor/${result.data.id}`);
     };
 
     /** 📄 Pagination handler */
@@ -114,7 +114,7 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
                             json={previewJson}
                             admin={admin}
                             onClick={() => handleTemplateClick(template)} // 7. Use the new handler
-                            onEdit={() => router.push(`/templates/edit/${template.id}`)}
+                            onEdit={() => window.open(`/templates/edit/${template.id}`)}
                             onLoaded={() => {
                                 setLoadedCount((prev) => {
                                     if (prev.has(template.id)) return prev;

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { Editor } from "@/features/editor/components/editor";
 import { getTemplateById } from "@/lib/templates";
+import { LogoEditor } from "@/features/editor/components/logo-editor";
 
 interface Props {
     params: { templateId: string };
@@ -12,7 +12,7 @@ export default async function EditTemplatePage({ params }: Props) {
     if (!template) return notFound();
 
     return (
-        <Editor
+        <LogoEditor
             initialData={{
                 id: template.id,
                 json: JSON.stringify(template.json),

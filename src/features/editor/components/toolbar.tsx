@@ -77,6 +77,7 @@ export const Toolbar = ({
   const isText = isTextType(selectedObjectType);
   const isImage = selectedObjectType === "image";
 
+
   const onChangeFontSize = (value: number) => {
     if (!selectedObject) {
       return;
@@ -245,6 +246,7 @@ export const Toolbar = ({
             >
               <div className="max-w-[100px] truncate">
                 {properties.fontFamily}
+                
               </div>
               <ChevronDown className="size-4 ml-2 shrink-0" />
             </Button>
