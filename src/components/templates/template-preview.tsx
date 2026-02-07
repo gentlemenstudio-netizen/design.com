@@ -108,6 +108,7 @@ export const TemplatePreview = ({
             fontFamily: brandData.fontFamily || "Arial",
             fill: brandData.fill || "#000000",
             fontWeight: brandData.fontWeight || "bold",
+            charSpacing: brandData.charSpacing || 0,
             textAlign: "center",
             width: width - (PADDING * 2), // Set the boundary
             splitByGrapheme: false, // Prevents breaking words in the middle
