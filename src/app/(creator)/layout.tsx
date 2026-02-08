@@ -3,7 +3,7 @@ import { Providers } from "@/components/providers";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { FONT_VARIABLES } from "@/lib/brand-fonts";
-import { Navbar } from "./logos/navbar";
+import { Navbar } from "./navbar";
 import { Footer } from "./logos/footer";
 
 

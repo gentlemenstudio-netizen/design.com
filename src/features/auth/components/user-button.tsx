@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { CreditCard, Crown, Loader, LogOut } from "lucide-react";
+import { CreditCard, Crown, LayoutGrid, Loader, LogOut } from "lucide-react";
 
 import {
   Avatar,
@@ -72,6 +72,15 @@ export const UserButton = () => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuItem
+          onClick={() => router.push("/saved-logos")}
+          className="h-10 cursor-pointer"
+        >
+          <LayoutGrid className="size-4 mr-2" />
+          Saved Logos
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           disabled={mutation.isPending}
           onClick={onClick}

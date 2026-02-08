@@ -14,7 +14,7 @@ export const useGetProjects = () => {
       const response = await client.api.projects.$get({
         query: {
           page: (pageParam as number).toString(),
-          limit: "5",
+          limit: "8",
         },
       });
 
