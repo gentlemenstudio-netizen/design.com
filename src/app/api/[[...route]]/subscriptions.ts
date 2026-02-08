@@ -70,7 +70,7 @@ const app = new Hono()
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}?canceled=1`,
       payment_method_types: ["card"],
       mode: "subscription",
-      billing_address_collection: "auto",
+      billing_address_collection: "required",
       customer_email: auth.token.email || "",
       line_items: [
         {
