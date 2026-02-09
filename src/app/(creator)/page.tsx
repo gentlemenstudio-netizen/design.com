@@ -2,17 +2,25 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2, Sparkles } from "lucide-react"
+import NProgress from "nprogress";;
 
 export default function LogoHomePage() {
     const [brand, setBrand] = useState("");
+    const [isGenerating, setIsGenerating] = useState(false); // New state
     const router = useRouter();
 
-    const handleGenerate = () => {
+ const handleGenerate = (e?: React.FormEvent) => {
+        // Prevent page reload on form submission
+        if (e) e.preventDefault();
+        
         if (!brand.trim()) return;
+        
+        NProgress.start();
+        setIsGenerating(true);
         router.push(`/logos/templates?brand=${encodeURIComponent(brand)}`);
-        router.refresh();
     };
+    
 
     return (
         <div className="flex flex-col w-full">
@@ -25,7 +33,11 @@ export default function LogoHomePage() {
                     Launch and grow your dream business
                 </p>
 
-                <div className="flex w-full max-w-2xl bg-[#1a1a1a] p-2 rounded-2xl border border-white/10 shadow-2xl">
+               
+                    <form 
+                    onSubmit={handleGenerate}
+                    className="flex w-full max-w-2xl bg-[#1a1a1a] p-2 rounded-2xl border border-white/10 shadow-2xl"
+                >
                     <input
                         value={brand}
                         onChange={(e) => setBrand(e.target.value)}
@@ -33,12 +45,22 @@ export default function LogoHomePage() {
                         className="flex-1 bg-transparent text-white px-6 py-4 text-lg focus:outline-none placeholder:text-gray-600"
                     />
                     <button
-                        onClick={handleGenerate}
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg active:scale-95"
+                        type="submit" // Ensure type is submit
+                        disabled={isGenerating}
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-70 flex items-center gap-2"
                     >
-                        Create Logos
+                        {isGenerating ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Generating...
+                            </>
+                        ) : (
+                            "Create Logos"
+                        )}
                     </button>
-                </div>
+                </form>
+                    
+                
             </section>
 
             {/* Modern Logo-Only Showcase Section */}

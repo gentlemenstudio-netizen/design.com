@@ -197,22 +197,26 @@ export const TemplatePreview = ({
     }, [json]);
 
     return (
-        <div className="group relative">
-            <div
-                ref={containerRef}
-                className="relative w-full border rounded-xl overflow-hidden aspect-[1.24/1] shadow-sm bg-white"
-                onClick={onClick}
-            >
-                {!ready && <div className="absolute inset-0 bg-slate-50 animate-pulse" />}
-                <canvas ref={canvasRef} />
-            </div>
+   <div className="group relative">
+    <div
+        ref={containerRef}
+        
+        className="relative w-full border rounded-xl overflow-hidden aspect-[1.24/1] shadow-sm bg-white cursor-pointer"
+        onClick={onClick}
+    >
+        {!ready && <div className="absolute inset-0 bg-slate-50 animate-pulse" />}
+        
+        {/* ADDED style to prevent the canvas from overriding the cursor */}
+        <canvas ref={canvasRef} style={{ cursor: 'pointer' }} />
+    </div>
 
-            {admin && (
-                <div className="mt-2 flex gap-2">
-                    <button onClick={onEdit} className="flex-1 bg-slate-900 text-white text-[10px] py-2 rounded-lg font-bold">EDIT</button>
-                    <button onClick={onDelete} className="flex-1 bg-rose-50 text-rose-600 text-[10px] py-2 rounded-lg font-bold">DELETE</button>
-                </div>
-            )}
+    {admin && (
+        <div className="mt-2 flex gap-2">
+            {/* Added cursor-pointer to buttons just in case */}
+            <button onClick={onEdit} className="flex-1 bg-slate-900 text-white text-[10px] py-2 rounded-lg font-bold cursor-pointer">EDIT</button>
+            <button onClick={onDelete} className="flex-1 bg-rose-50 text-rose-600 text-[10px] py-2 rounded-lg font-bold cursor-pointer">DELETE</button>
         </div>
+    )}
+</div>
     );
 };

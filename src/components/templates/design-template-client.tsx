@@ -42,6 +42,10 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
     const [showAuthModal, setShowAuthModal] = useState(false); // 4. Modal state
     const [loadedCount, setLoadedCount] = useState<Set<string>>(new Set());
 
+        // Define a Skeleton Component
+    const TemplateSkeleton = () => (
+        <div className="aspect-[1.24/1] w-full bg-slate-200 animate-pulse rounded-xl" />
+    );
     // ... (Keep existing refs and pagination logic)
 
     const initialBrand = searchParams.get("brand") || "";
@@ -109,6 +113,15 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
                     });
 
                     return (
+                        <div key={template.id} className="relative">
+                {/* Show Skeleton until the Canvas is actually rendered */}
+                {!loadedCount.has(template.id) && <TemplateSkeleton />}
+                
+               <div className={cn(
+        "group transition hover:opacity-90", // Use 'group' to trigger children
+        loadedCount.has(template.id) ? "block" : "hidden"
+    )}>
+        <div className="cursor-pointer">
                         <TemplatePreview
                             key={template.id}
                             json={previewJson}
@@ -129,9 +142,13 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
                                 router.refresh();
                             }}
                         />
+                        </div>
+                        </div>
+                        </div>
                     );
                 })}
             </div>
+            
 
             {totalPages > 1 && (
                 <div className="flex flex-col items-center justify-center gap-y-4 pt-12 pb-8">

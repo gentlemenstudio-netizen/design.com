@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { FONT_VARIABLES } from "@/lib/brand-fonts";
 import { Navbar } from "./navbar";
 import { Footer } from "./logos/footer";
+import { LoadingBar } from "@/components/ui/loading-bar";
 
 
 
@@ -27,6 +28,7 @@ const CreatorLayout = async ({ children }: CreatorLayoutProps) => {
                     <Providers>
                         {/* Wrapper background set to Black to match Navbar */}
                         <div className="bg-black h-screen flex flex-col">
+                            <LoadingBar />
                             <Navbar />
                             <main className="flex-1 bg-white overflow-auto lg:rounded-tl-[48px] shadow-2xl">
                                 {children}
