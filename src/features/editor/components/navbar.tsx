@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { UserButton } from "@/features/auth/components/user-button";
-
 import { ActiveTool, Editor } from "@/features/editor/types";
 import { Logo } from "@/features/editor/components/logo";
 
@@ -29,13 +28,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AdminSvgUploadButton } from "./svg-upload-button";
+import { usePaywall } from "@/features/subscriptions/hooks/use-paywall";
 
 interface NavbarProps {
   id: string;
   editor: Editor | undefined;
   activeTool: ActiveTool;
   onChangeActiveTool: (tool: ActiveTool) => void;
-  onSaveTemplate?: () => void; // 👈 ADD THIS
+  onSaveTemplate?: () => void;
 };
 
 export const Navbar = ({
@@ -45,188 +45,197 @@ export const Navbar = ({
   onChangeActiveTool,
   onSaveTemplate
 }: NavbarProps) => {
+  const { shouldBlock, triggerPaywall, isLoading: isLoadingPaywall } = usePaywall();
+
   const data = useMutationState({
     filters: {
       mutationKey: ["project", { id }],
-      exact: true,
     },
     select: (mutation) => mutation.state.status,
   });
 
-  const currentStatus = data[data.length - 1];
+  const lastStatus = data[data.length - 1];
 
-  const isError = currentStatus === "error";
-  const isPending = currentStatus === "pending";
+  const isError = lastStatus === "error";
+  const isPending = lastStatus === "pending";
 
   const { openFilePicker } = useFilePicker({
     accept: ".json",
     onFilesSuccessfullySelected: ({ plainFiles }: any) => {
-      if (plainFiles && plainFiles.length > 0) {
+      if (plainFiles.length > 0) {
         const file = plainFiles[0];
         const reader = new FileReader();
-        reader.readAsText(file, "UTF-8");
-        reader.onload = () => {
-          editor?.loadJson(reader.result as string);
+        reader.onload = (e) => {
+          editor?.loadJson(e.target?.result as string);
         };
+        reader.readAsText(file);
       }
     },
   });
 
   return (
-    <nav className="w-full flex items-center p-4 h-[68px] gap-x-8 border-b lg:pl-[34px]">
+    <nav className="w-full flex items-center p-4 h-[68px] gap-x-8 border-b border-white/10 bg-black text-white lg:pl-[34px]">
       <Logo />
       <div className="w-full flex items-center gap-x-1 h-full">
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="ghost">
+            <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">
               File
               <ChevronDown className="size-4 ml-2" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-60">
+          <DropdownMenuContent align="start" className="min-w-60 bg-[#1a1a1a] border-white/10 text-white">
             <DropdownMenuItem
               onClick={() => openFilePicker()}
-              className="flex items-center gap-x-2"
+              className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
             >
-              <CiFileOn className="size-8" />
+              <CiFileOn className="size-8 text-indigo-400" />
               <div>
-                <p>Open</p>
-                <p className="text-xs text-muted-foreground">
-                  Open a JSON file
-                </p>
+                <p className="font-bold">Open</p>
+                <p className="text-xs text-slate-400">Open a JSON file</p>
               </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Separator orientation="vertical" className="mx-2" />
+        
+        <Separator orientation="vertical" className="mx-2 bg-white/10" />
+        
         <Hint label="Select" side="bottom" sideOffset={10}>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onChangeActiveTool("select")}
-            className={cn(activeTool === "select" && "bg-gray-100")}
+            className={cn("text-white hover:bg-white/10", activeTool === "select" && "bg-white/10")}
           >
             <MousePointerClick className="size-4" />
           </Button>
         </Hint>
+
         <Hint label="Undo" side="bottom" sideOffset={10}>
           <Button
             disabled={!editor?.canUndo()}
             variant="ghost"
             size="icon"
             onClick={() => editor?.onUndo()}
+            className="text-white hover:bg-white/10 disabled:opacity-30"
           >
             <Undo2 className="size-4" />
           </Button>
         </Hint>
+
         <Hint label="Redo" side="bottom" sideOffset={10}>
           <Button
             disabled={!editor?.canRedo()}
             variant="ghost"
             size="icon"
             onClick={() => editor?.onRedo()}
+            className="text-white hover:bg-white/10 disabled:opacity-30"
           >
             <Redo2 className="size-4" />
           </Button>
         </Hint>
-        <Separator orientation="vertical" className="mx-2" />
+
+        <Separator orientation="vertical" className="mx-2 bg-white/10" />
+        
         {isPending && (
           <div className="flex items-center gap-x-2">
-            <Loader className="size-4 animate-spin text-muted-foreground" />
-            <div className="text-xs text-muted-foreground">
-              Saving...
-            </div>
+            <Loader className="size-4 animate-spin text-slate-400" />
+            <p className="text-xs text-slate-400">Saving...</p>
           </div>
         )}
         {!isPending && isError && (
           <div className="flex items-center gap-x-2">
-            <BsCloudSlash className="size-[20px] text-muted-foreground" />
-            <div className="text-xs text-muted-foreground">
-              Failed to save
-            </div>
+            <BsCloudSlash className="size-4 text-rose-500" />
+            <p className="text-xs text-slate-400">Failed to save</p>
           </div>
         )}
         {!isPending && !isError && (
           <div className="flex items-center gap-x-2">
-            <BsCloudCheck className="size-[20px] text-muted-foreground" />
-            <div className="text-xs text-muted-foreground">
-              Saved
-            </div>
+            <BsCloudCheck className="size-4 text-emerald-500" />
+            <p className="text-xs text-slate-400">Saved</p>
           </div>
         )}
-        {onSaveTemplate && (
-          <Button
-            variant="secondary"
-            onClick={onSaveTemplate}
-          >
-            Save as Template
-          </Button>
-        )}
-
-        <AdminSvgUploadButton
-          editor={editor!}
-          onClose={() => { }}
-        />
 
         <div className="ml-auto flex items-center gap-x-4">
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="ghost">
-                Export
-                <Download className="size-4 ml-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-60">
-              <DropdownMenuItem
-                className="flex items-center gap-x-2"
-                onClick={() => editor?.saveJson()}
+          <AdminSvgUploadButton
+           editor={editor!}
+          onClose={() => { }}
+           />
+          
+          {onSaveTemplate && (
+             <Button 
+                onClick={onSaveTemplate} 
+                variant="ghost" 
+                size="sm" 
+                className="text-white hover:bg-white/10"
               >
-                <CiFileOn className="size-8" />
-                <div>
-                  <p>JSON</p>
-                  <p className="text-xs text-muted-foreground">
-                    Save for later editing
-                  </p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center gap-x-2"
-                onClick={() => editor?.savePng()}
-              >
-                <CiFileOn className="size-8" />
-                <div>
-                  <p>PNG</p>
-                  <p className="text-xs text-muted-foreground">
-                    Best for sharing on the web
-                  </p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center gap-x-2"
-                onClick={() => editor?.saveJpg()}
-              >
-                <CiFileOn className="size-8" />
-                <div>
-                  <p>JPG</p>
-                  <p className="text-xs text-muted-foreground">
-                    Best for printing
-                  </p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center gap-x-2"
-                onClick={() => editor?.saveSvg()}
-              >
-                <CiFileOn className="size-8" />
-                <div>
-                  <p>SVG</p>
-                  <p className="text-xs text-muted-foreground">
-                    Best for editing in vector software
-                  </p>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+               Save Template
+             </Button>
+          )}
+
+          {shouldBlock ? (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={triggerPaywall}
+              disabled={isLoadingPaywall}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+            >
+              Download
+              <Download className="size-4 ml-2" />
+            </Button>
+          ) : (
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">
+                  Export
+                  <Download className="size-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-60 bg-[#1a1a1a] border-white/10 text-white">
+                <DropdownMenuItem
+                  className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
+                  onClick={() => editor?.saveJson()}
+                >
+                  <CiFileOn className="size-8 text-indigo-400" />
+                  <div>
+                    <p className="font-bold">JSON</p>
+                    <p className="text-xs text-slate-400">Save for later editing</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
+                  onClick={() => editor?.savePng()}
+                >
+                  <CiFileOn className="size-8 text-indigo-400" />
+                  <div>
+                    <p className="font-bold">PNG</p>
+                    <p className="text-xs text-slate-400">Best for sharing on the web</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
+                  onClick={() => editor?.saveJpg()}
+                >
+                  <CiFileOn className="size-8 text-indigo-400" />
+                  <div>
+                    <p className="font-bold">JPG</p>
+                    <p className="text-xs text-slate-400">Best for printing</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
+                  onClick={() => editor?.saveSvg()}
+                >
+                  <CiFileOn className="size-8 text-indigo-400" />
+                  <div>
+                    <p className="font-bold">SVG</p>
+                    <p className="text-xs text-slate-400">Best for vector editing</p>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           <UserButton />
         </div>
       </div>
