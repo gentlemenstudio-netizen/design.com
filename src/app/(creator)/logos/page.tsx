@@ -2,147 +2,120 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Loader2, Sparkles } from "lucide-react"
-import NProgress from "nprogress";;
+import { ArrowRight, Loader2, Sparkles, CheckCircle, Palette, Layers, Zap } from "lucide-react";
+import NProgress from "nprogress";
+import Image from "next/image";
 
 export default function LogoHomePage() {
     const [brand, setBrand] = useState("");
-    const [isGenerating, setIsGenerating] = useState(false); // New state
+    const [isGenerating, setIsGenerating] = useState(false);
     const router = useRouter();
 
- const handleGenerate = (e?: React.FormEvent) => {
-        // Prevent page reload on form submission
+    const handleGenerate = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        
         if (!brand.trim()) return;
         
         NProgress.start();
         setIsGenerating(true);
         router.push(`/logos/templates?brand=${encodeURIComponent(brand)}`);
     };
-    
 
     return (
-        <div className="flex flex-col w-full">
-            {/* Hero Section */}
-            <section className="bg-black text-white pt-24 pb-32 px-4 flex flex-col items-center text-center">
-                <h1 className="text-6xl md:text-7xl font-bold tracking-tighter mb-4 max-w-4xl leading-[1.1]">
-                    Design & Branding <br /> Made Easy
+        <div className="flex flex-col w-full bg-white">
+            {/* HERO SECTION: Dark & Premium */}
+            <section className="bg-black text-white pt-24 pb-20 px-4 flex flex-col items-center text-center">
+                <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-indigo-400 text-sm font-bold mb-8 border border-white/10 animate-fade-in">
+                    <Sparkles className="size-4" />
+                    AI-Powered Design Intelligence
+                </div>
+
+                <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6 max-w-5xl leading-[0.9]">
+                    Identity <br className="hidden md:block" /> Crafted in Minutes.
                 </h1>
-                <p className="text-xl text-gray-400 mb-10 font-medium">
-                    Launch and grow your dream business
+                
+                <p className="text-xl text-gray-400 mb-12 font-medium max-w-2xl mx-auto leading-relaxed">
+                    Create professional, high-quality logos with our intelligent design platform. 
+                    Customize fonts, colors, and layouts effortlessly—no design experience required.
                 </p>
 
-                <div className="flex w-full max-w-2xl bg-[#1a1a1a] p-2 rounded-2xl border border-white/10 shadow-2xl">
-                    <form 
+                <form 
                     onSubmit={handleGenerate}
-                    className="flex w-full max-w-2xl bg-[#1a1a1a] p-2 rounded-2xl border border-white/10 shadow-2xl"
+                    className="flex w-full max-w-2xl bg-[#1a1a1a] p-2 rounded-2xl border border-white/10 shadow-2xl focus-within:border-indigo-500 transition-all mb-12"
                 >
                     <input
                         value={brand}
                         onChange={(e) => setBrand(e.target.value)}
-                        placeholder="Enter your brand name"
-                        className="flex-1 bg-transparent text-white px-6 py-4 text-lg focus:outline-none placeholder:text-gray-600"
+                        placeholder="Enter your brand name..."
+                        className="flex-1 bg-transparent text-white px-6 py-4 text-lg focus:outline-none placeholder:text-gray-600 font-medium"
                     />
                     <button
-                        type="submit" // Ensure type is submit
+                        type="submit"
                         disabled={isGenerating}
                         className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-70 flex items-center gap-2"
                     >
-                        {isGenerating ? (
-                            <>
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                                Generating...
-                            </>
-                        ) : (
-                            "Create Logos"
-                        )}
+                        {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Start Designing"}
+                        {!isGenerating && <ArrowRight className="size-5" />}
                     </button>
                 </form>
-                    
+
+                {/* THE COLLAGE SHOWCASE: Visual Grid */}
+                <div className="w-full max-w-6xl mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 px-4 opacity-80">
+                    <div className="h-48 bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+                        <Image src="/logo.svg" alt="Logo Sample" width={80} height={80} className="opacity-50" />
+                    </div>
+                    <div className="h-48 bg-indigo-600/20 rounded-3xl border border-indigo-500/20 flex items-center justify-center translate-y-8">
+                        <Palette className="size-12 text-indigo-400" />
+                    </div>
+                    <div className="h-48 bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+                         <Layers className="size-12 text-slate-500" />
+                    </div>
+                    <div className="h-48 bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center translate-y-8">
+                         <Zap className="size-12 text-amber-400" />
+                    </div>
                 </div>
             </section>
 
-            {/* Modern Logo-Only Showcase Section */}
-            <section className="bg-white -mt-10 rounded-t-[48px] py-24 px-8 border-t relative z-10">
+            {/* VALUE PROPOSITION SECTION: Light & Clean */}
+            <section className="py-32 px-6 bg-white">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4">
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-[0.2em]">
-                                <Sparkles className="w-4 h-4" />
-                                <span>Logo Templates</span>
+                    <div className="grid md:grid-cols-2 gap-20 items-center">
+                        <div className="space-y-8">
+                            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+                                Design logos that look premium and unique.
+                            </h2>
+                            <p className="text-lg text-slate-600 leading-relaxed font-medium">
+                                Whether you&apos;re launching a startup, growing a small business, or rebranding, 
+                                our powerful tools help you craft a logo that truly represents your brand identity. 
+                                With smart automation and creative flexibility combined, you get results that stand out.
+                            </p>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                                {[
+                                    "Unlimited Logo Packs",
+                                    "Business Card Templates",
+                                    "Premium Flyer Designs",
+                                    "High-Res Export (SVG/PNG)"
+                                ].map((item) => (
+                                    <div key={item} className="flex items-center gap-3 font-bold text-slate-800">
+                                        <CheckCircle className="size-5 text-indigo-600" />
+                                        {item}
+                                    </div>
+                                ))}
                             </div>
-                            <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Explore Professional Styles</h2>
                         </div>
-                        <button
-                            onClick={() => router.push('/logos')}
-                            className="flex items-center gap-2 text-slate-500 font-bold hover:text-indigo-600 transition-colors group"
-                        >
-                            View all templates <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </button>
-                    </div>
 
-                    {/* Staggered Bento Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[220px]">
-
-                        {/* 1. Large Featured Minimal Logo (Takes up 2x2 area) */}
-                        <div className="md:col-span-2 md:row-span-2 bg-[#f8faff] rounded-[40px] border border-blue-50 p-12 flex flex-col items-center justify-center group cursor-pointer hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500">
-                            <div className="w-44 h-44 bg-white rounded-full shadow-sm border flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-                                <div className="w-20 h-20 border-4 border-indigo-600 rounded-lg rotate-45 flex items-center justify-center">
-                                    <div className="w-8 h-8 bg-indigo-600 rounded-sm -rotate-45" />
+                        {/* Visual Asset / Mockup Area */}
+                        <div className="relative bg-slate-50 rounded-[40px] p-8 aspect-square flex items-center justify-center overflow-hidden border border-slate-100">
+                             <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-transparent" />
+                             <div className="relative z-10 w-full grid grid-cols-2 gap-4">
+                                <div className="aspect-square bg-white rounded-2xl shadow-xl shadow-indigo-100 p-6 flex items-center justify-center animate-bounce duration-[3000ms]">
+                                    <Image src="/logo.svg" alt="Preview" width={100} height={100} />
                                 </div>
-                            </div>
-                            <h3 className="text-3xl font-black text-slate-900 tracking-tight">AVID VENTURES</h3>
-                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mt-3">Modern Minimal</p>
+                                <div className="aspect-square bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-200 p-6 flex items-center justify-center translate-y-12">
+                                    <span className="text-white font-black text-4xl">G</span>
+                                </div>
+                             </div>
                         </div>
-
-                        {/* 2. Dark Luxury Wordmark (Wide) */}
-                        <div className="md:col-span-2 bg-[#111] rounded-[40px] p-8 flex flex-col items-center justify-center group cursor-pointer overflow-hidden relative border border-white/5">
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="relative text-center">
-                                <span className="text-5xl font-serif italic text-white font-light border-b border-white/20 pb-2 px-6">Gentlemen</span>
-                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] mt-6">Luxury Branding</p>
-                            </div>
-                        </div>
-
-                        {/* 3. Tech/SaaS Style (Tall) */}
-                        <div className="md:col-span-1 md:row-span-1 bg-white rounded-[40px] border border-slate-100 shadow-sm p-8 flex flex-col items-center justify-center group cursor-pointer hover:border-indigo-200 transition-all">
-                            <div className="flex gap-1.5 mb-6">
-                                <div className="w-3.5 h-10 bg-slate-900 rounded-full group-hover:bg-indigo-600 transition-colors" />
-                                <div className="w-3.5 h-14 bg-indigo-600 rounded-full" />
-                                <div className="w-3.5 h-10 bg-slate-900 rounded-full group-hover:bg-indigo-600 transition-colors" />
-                            </div>
-                            <p className="font-black text-slate-900 text-xs uppercase tracking-widest">Tech Flow</p>
-                        </div>
-
-                        {/* 4. Playful/Vibrant Style */}
-                        <div className="md:col-span-1 bg-[#fff8f1] rounded-[40px] border border-orange-100 p-8 flex flex-col items-center justify-center text-center group cursor-pointer hover:scale-[1.02] transition-transform">
-                            <div className="w-20 h-20 bg-orange-500 rounded-[24px] mb-4 shadow-xl shadow-orange-200 flex items-center justify-center text-white text-3xl font-bold">S</div>
-                            <p className="font-bold text-orange-900 text-xs tracking-widest uppercase">Creative</p>
-                        </div>
-
-                        {/* 5. Classic Badge Style (Wide Bottom) */}
-                        <div className="md:col-span-2 bg-slate-50 rounded-[40px] p-10 flex items-center gap-10 group cursor-pointer overflow-hidden border border-slate-100">
-                            <div className="w-28 h-28 border-[3px] border-slate-300 rounded-full flex items-center justify-center border-dashed group-hover:rotate-12 transition-transform duration-700">
-                                <div className="w-20 h-20 bg-white shadow-inner rounded-full flex items-center justify-center font-black text-slate-300 text-2xl">EST</div>
-                            </div>
-                            <div className="space-y-1">
-                                <h4 className="font-black text-slate-900 text-xl tracking-tight">Vintage Badges</h4>
-                                <p className="text-slate-500 text-sm font-medium">Timeless emblem designs for established businesses.</p>
-                            </div>
-                        </div>
-
-
-                        <div className="md:col-span-2 bg-slate-50 rounded-[40px] p-10 flex items-center gap-10 group cursor-pointer overflow-hidden border border-slate-100">
-                            <div className="w-28 h-28 border-[3px] border-slate-300 rounded-full flex items-center justify-center border-dashed group-hover:rotate-12 transition-transform duration-700">
-                                <div className="w-20 h-20 bg-white shadow-inner rounded-full flex items-center justify-center font-black text-slate-300 text-2xl">EST</div>
-                            </div>
-                            <div className="space-y-1">
-                                <h4 className="font-black text-slate-900 text-xl tracking-tight">Vintage Badges</h4>
-                                <p className="text-slate-500 text-sm font-medium">Timeless emblem designs for established businesses.</p>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </section>

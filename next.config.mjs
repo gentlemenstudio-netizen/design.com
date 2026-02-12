@@ -12,6 +12,12 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "n11asj8ry1.ufs.sh", // Your specific UploadThing host
+        port: "",
+        pathname: "/f/**",
+      },
+      {
+        protocol: "https",
         hostname: "replicate.delivery",
       },
       {
