@@ -42,6 +42,18 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
     const [showAuthModal, setShowAuthModal] = useState(false); // 4. Modal state
     const [loadedCount, setLoadedCount] = useState<Set<string>>(new Set());
 
+    const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
+const COLORS = [
+    { name: "Original", value: null, class: "bg-slate-200" },
+    { name: "Indigo", value: "#4f46e5", class: "bg-indigo-600" },
+    { name: "Rose", value: "#e11d48", class: "bg-rose-600" },
+    { name: "Emerald", value: "#10b981", class: "bg-emerald-600" },
+    { name: "Amber", value: "#f59e0b", class: "bg-amber-500" },
+    { name: "Sky", value: "#0ea5e9", class: "bg-sky-500" },
+    { name: "Black", value: "#000000", class: "bg-black" },
+];
+
         // Define a Skeleton Component
     const TemplateSkeleton = () => (
         <div className="aspect-[1.24/1] w-full bg-slate-200 animate-pulse rounded-xl" />
@@ -103,13 +115,38 @@ export const DesignTemplateClient = ({ templates, type, totalPages, page, admin 
                     <SignInCard />
                 </DialogContent>
             </Dialog>
+            {/* <div className="flex items-center gap-x-3 mb-8 overflow-x-auto pb-2">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2">
+                        Preview Colors:
+                    </span>
+                    {COLORS.map((color) => (
+                        <button
+                            key={color.name}
+                            onClick={() => setSelectedColor(color.value)}
+                            className={cn(
+                                "group relative flex items-center justify-center transition-all",
+                                selectedColor === color.value ? "scale-110" : "hover:scale-105"
+                            )}
+                        >
+                            <div className={cn(
+                                "size-8 rounded-full border-2 border-white shadow-sm",
+                                color.class,
+                                selectedColor === color.value ? "ring-2 ring-indigo-600 ring-offset-2" : "ring-1 ring-slate-200"
+                            )} />
+                            <span className="absolute -bottom-6 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                                {color.name}
+                            </span>
+                        </button>
+                    ))}
+                </div> */}
 
             {/* templates grid */}
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {templates.map((template) => {
                     const previewJson = injectTemplateVariables(template.json, {
                         BRAND_NAME: initialBrand.toUpperCase() || "LOGOTEXT",
-                        TAGLINE: initialTagline.toUpperCase() || "SLOGAN HERE"
+                        TAGLINE: initialTagline.toUpperCase() || "SLOGAN HERE",
+                        PRIMARY_COLOR: selectedColor || undefined,
                     });
 
                     return (
