@@ -69,7 +69,7 @@ export const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between gap-4">
                     <p className="text-xs text-gray-500">
-                        © {new Date().getFullYear()} Gentlemen Designs. All rights reserved.
+                        © {new Date().getFullYear()} Gentlemen Studio. All rights reserved.
                     </p>
                     <div className="flex gap-x-6 text-xs text-gray-500">
                         <Link href="#" className="hover:text-white transition">Privacy Policy</Link>

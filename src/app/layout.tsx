@@ -11,8 +11,8 @@ import { FONT_VARIABLES } from "@/lib/brand-fonts";
 
 
 export const metadata: Metadata = {
-  title: "Gentlemen Designs",
-  description: "Build Something Great!",
+  title: "Logomust.com",
+  description: "AI-powered logo design and branding tools for creators. Transform your ideas into stunning logos, business cards, and more with our intuitive platform. Start building your brand identity today!",
 };
 
 export default async function RootLayout({
