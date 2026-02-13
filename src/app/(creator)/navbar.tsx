@@ -26,13 +26,13 @@ export const Navbar = () => {
           {/* <Link href="/business-cards" className="flex items-center gap-x-1 hover:text-indigo-400 transition font-medium text-[15px]">
             Business Cards <ChevronDown className="w-4 h-4 opacity-50" />
           </Link> */}
-            <div className="flex items-center gap-x-2 text-gray-500 cursor-not-allowed">
+          <div className="flex items-center gap-x-2 text-gray-500 cursor-not-allowed">
             <span className="text-[15px] font-medium">Business Cards</span>
-            <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">Soon</span>
+            <span className="bg-brand-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">Soon</span>
           </div>
           <div className="flex items-center gap-x-2 text-gray-500 cursor-not-allowed">
             <span className="text-[15px] font-medium">Flyers</span>
-            <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">Soon</span>
+            <span className="bg-brand-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">Soon</span>
           </div>
         </div>
 

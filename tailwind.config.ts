@@ -20,6 +20,22 @@ const config = {
     },
     extend: {
       colors: {
+        brand: {
+          // The "Little Dark Red" from your logo
+          primary: "#8B0000", 
+          // A lighter version for hovers
+          light: "#db2c2c",
+          // A deep version for shadows/borders
+          ultralight: "rgb(255, 231, 231)",
+          // A deep version for shadows/borders
+          dark: "#4B0000",
+          // The secondary dark/black from your logo
+          accent: "#1A1A1A",
+        },
+        backgroundImage: {
+        // A custom gradient that matches your logo's depth
+        'brand-gradient': "linear-gradient(to right, #8B0000, #4B0000)",
+      },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

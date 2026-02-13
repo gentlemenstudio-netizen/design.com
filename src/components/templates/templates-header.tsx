@@ -73,7 +73,7 @@ export const TemplatesHeader = ({ initialBrand, initialTagline }: TemplatesHeade
                   <button
                 type="submit"
                 disabled={isSearching}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition-all active:scale-95 flex items-center justify-center disabled:opacity-70 min-w-[44px]"
+                className="bg-brand-primary hover:bg-brand-light text-white p-3 rounded-xl transition-all active:scale-95 flex items-center justify-center disabled:opacity-70 min-w-[44px]"
             >
                 {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
             </button>

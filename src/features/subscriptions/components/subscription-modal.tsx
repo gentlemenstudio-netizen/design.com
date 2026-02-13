@@ -23,7 +23,7 @@ export const SubscriptionModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[400px] p-0 overflow-hidden border-none shadow-2xl">
-        <div className="h-2 bg-indigo-600 w-full" />
+        <div className="h-2 bg-brand-primary w-full" />
         
         <div className="p-8">
             <DialogHeader className="flex items-center space-y-4">
@@ -55,15 +55,15 @@ export const SubscriptionModal = () => {
                 <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200">
                     <ul className="space-y-3">
                         <li className="flex items-center text-sm font-bold text-slate-700">
-                            <CheckCircle2 className="size-5 mr-3 fill-indigo-600 text-white shrink-0" />
+                            <CheckCircle2 className="size-5 mr-3 fill-brand-light text-white shrink-0" />
                             Unlimited High-Res Downloads
                         </li>
                         <li className="flex items-center text-sm font-bold text-slate-700">
-                            <CheckCircle2 className="size-5 mr-3 fill-indigo-600 text-white shrink-0" />
+                            <CheckCircle2 className="size-5 mr-3 fill-brand-light text-white shrink-0" />
                             SVG, PNG, & JPG Formats
                         </li>
                         <li className="flex items-center text-sm font-bold text-slate-700">
-                            <CheckCircle2 className="size-5 mr-3 fill-indigo-600 text-white shrink-0" />
+                            <CheckCircle2 className="size-5 mr-3 fill-brand-light text-white shrink-0" />
                             Full Commercial License
                         </li>
                     </ul>
@@ -73,7 +73,7 @@ export const SubscriptionModal = () => {
             <DialogFooter className="pt-6 flex flex-col items-center gap-4">
               
                 <Button
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 h-14 text-lg font-bold shadow-lg shadow-indigo-100 transition-all active:scale-95 group"
+                    className="w-full bg-brand-primary hover:bg-brand-dark h-14 text-lg font-bold shadow-lg shadow-brand-primary/20 transition-all active:scale-95 group"
                     onClick={() => mutation.mutate()}
                     disabled={mutation.isPending}
                 >

@@ -179,7 +179,7 @@ export const Navbar = ({
               variant="default"
               onClick={triggerPaywall}
               disabled={isLoadingPaywall}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+              className="bg-brand-primary hover:bg-brand-light text-white font-bold"
             >
               Download
               <Download className="size-4 ml-2" />
@@ -197,7 +197,7 @@ export const Navbar = ({
                   className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
                   onClick={() => editor?.saveJson()}
                 >
-                  <CiFileOn className="size-8 text-indigo-400" />
+                  <CiFileOn className="size-8 text-brand-light" />
                   <div>
                     <p className="font-bold">JSON</p>
                     <p className="text-xs text-slate-400">Save for later editing</p>
@@ -207,7 +207,7 @@ export const Navbar = ({
                   className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
                   onClick={() => editor?.savePng()}
                 >
-                  <CiFileOn className="size-8 text-indigo-400" />
+                  <CiFileOn className="size-8 text-brand-light" />
                   <div>
                     <p className="font-bold">PNG</p>
                     <p className="text-xs text-slate-400">Best for sharing on the web</p>
@@ -217,7 +217,7 @@ export const Navbar = ({
                   className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
                   onClick={() => editor?.saveJpg()}
                 >
-                  <CiFileOn className="size-8 text-indigo-400" />
+                  <CiFileOn className="size-8 text-brand-light" />
                   <div>
                     <p className="font-bold">JPG</p>
                     <p className="text-xs text-slate-400">Best for printing</p>
@@ -227,7 +227,7 @@ export const Navbar = ({
                   className="flex items-center gap-x-2 focus:bg-white/10 focus:text-white cursor-pointer"
                   onClick={() => editor?.saveSvg()}
                 >
-                  <CiFileOn className="size-8 text-indigo-400" />
+                  <CiFileOn className="size-8 text-brand-light" />
                   <div>
                     <p className="font-bold">SVG</p>
                     <p className="text-xs text-slate-400">Best for vector editing</p>

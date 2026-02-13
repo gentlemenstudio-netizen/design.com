@@ -89,7 +89,7 @@ export default function ProjectsPage() {
                                     </h3>
                                     <Button 
                                         onClick={() => router.push(`/editor/${project.id}`)}
-                                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold h-9"
+                                        className="w-full bg-brand-primary hover:bg-brand-light text-white text-xs font-bold h-9"
                                     >
                                         Customize
                                     </Button>
@@ -106,7 +106,7 @@ export default function ProjectsPage() {
                             onClick={() => fetchNextPage()}
                             disabled={isFetchingNextPage}
                             variant="ghost"
-                            className="text-indigo-600 font-bold"
+                            className="text-brand-primary font-bold"
                         >
                             {isFetchingNextPage ? "Loading more..." : "Show more designs"}
                         </Button>

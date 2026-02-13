@@ -38,7 +38,7 @@ export default function LogoHomePage() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
 
                 <div className="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
-                    <div className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full text-indigo-400 text-sm font-bold mb-8 border border-white/10">
+                    <div className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full text-brand-light text-sm font-bold mb-8 border border-white/10">
                         <Sparkles className="size-4" />
                         Smart Design Platform
                     </div>
@@ -54,20 +54,20 @@ export default function LogoHomePage() {
 
                     <form 
                         onSubmit={handleGenerate}
-                        className="flex w-full max-w-2xl bg-white/5 p-2 rounded-2xl border border-white/10 shadow-2xl focus-within:border-indigo-500 transition-all mb-20"
+                        className="flex w-full max-w-2xl bg-white/95 p-2 rounded-2xl border border-white/10 shadow-2xl focus-within:border-brand-light transition-all mb-20"
                     >
                         <input
                             value={brand}
                             onChange={(e) => setBrand(e.target.value)}
                             placeholder="Enter your brand name..."
-                            className="flex-1 bg-transparent text-white px-6 py-4 text-lg focus:outline-none placeholder:text-gray-600 font-medium"
+                            className="flex-1 bg-transparent text-black px-6 py-4 text-lg focus:outline-none placeholder:text-gray-600 font-medium"
                         />
                         <button
                             type="submit"
                             disabled={isGenerating}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-70 flex items-center gap-2"
+                            className="bg-brand-primary hover:bg-brand-light text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-70 flex items-center gap-2"
                         >
-                            {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Start Designing"}
+                            {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create your Logo"}
                             {!isGenerating && <ArrowRight className="size-5" />}
                         </button>
                     </form>
@@ -102,7 +102,7 @@ export default function LogoHomePage() {
                                 </div>
 
                                 {/* 4. Bottom Right Accent */}
-                                <div className="hidden md:block md:col-span-2 bg-indigo-600 rounded-[40px] overflow-hidden relative group cursor-pointer">
+                                <div className="hidden md:block md:col-span-2 bg-brand-ultralight rounded-[40px] overflow-hidden relative group cursor-pointer">
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <Sparkles className="size-12 text-white/50 group-hover:scale-110 transition-transform" />
                                     </div>
@@ -115,8 +115,8 @@ export default function LogoHomePage() {
                             {/* Floating Decorative Elements (Matches the "Flyer" feel in your attachment) */}
                             <div className="absolute -top-10 -right-6 hidden lg:block animate-bounce duration-[5000ms]">
                                 <div className="bg-white p-4 rounded-2xl shadow-2xl rotate-12 border border-slate-200">
-                                    <div className="size-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                        <CheckCircle className="text-indigo-600 size-6" />
+                                    <div className="size-12 bg-brand-ultralight rounded-lg flex items-center justify-center">
+                                        <CheckCircle className="text-brand-primary size-6" />
                                     </div>
                                 </div>
                             </div>
@@ -139,7 +139,7 @@ export default function LogoHomePage() {
                             { icon: Download, title: "3. Launch", desc: "Download high-resolution SVG, PNG, and JPG files ready for any platform." }
                         ].map((step, i) => (
                             <div key={i} className="bg-white p-10 rounded-[40px] border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
-                                <div className="size-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                <div className="size-16 bg-brand-ultralight rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-light group-hover:text-white transition-colors">
                                     <step.icon className="size-8" />
                                 </div>
                                 <h3 className="text-2xl font-black text-slate-900 mb-4">{step.title}</h3>
@@ -171,7 +171,7 @@ export default function LogoHomePage() {
                                     "High-Resolution Export in multiple formats"
                                 ].map((item) => (
                                     <div key={item} className="flex items-center gap-3 font-bold text-slate-800">
-                                        <div className="size-6 bg-indigo-600 rounded-full flex items-center justify-center">
+                                        <div className="size-6 bg-brand-primary rounded-full flex items-center justify-center">
                                             <CheckCircle className="size-4 text-white" />
                                         </div>
                                         {item}
@@ -185,7 +185,7 @@ export default function LogoHomePage() {
                         </div>
 
                         {/* Interactive Preview Mockup */}
-                        <div className="relative bg-indigo-600 rounded-[60px] p-12 aspect-square flex items-center justify-center overflow-hidden">
+                        <div className="relative bg-brand-ultralight rounded-[60px] p-12 aspect-square flex items-center justify-center overflow-hidden">
                             <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
                             <div className="bg-white p-10 rounded-3xl shadow-2xl scale-110 relative z-10 rotate-3">
                                 <Image src="/logo.svg" alt="Preview" width={150} height={150} />

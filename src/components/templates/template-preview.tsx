@@ -4,6 +4,8 @@ import { fabric } from "fabric";
 import { useEffect, useRef, useState } from "react";
 import { loadCanvasFonts } from "@/lib/load-canvas-fonts";
 import { patchCanvasTextBaseline } from "@/lib/patch-canvas-textbaseline";
+import { cn } from "@/lib/utils";
+import { Edit3, Loader2, Trash } from "lucide-react";
 
 patchCanvasTextBaseline();
 
@@ -28,6 +30,15 @@ export const TemplatePreview = ({
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const fabricRef = useRef<fabric.Canvas | null>(null);
     const [ready, setReady] = useState(false);
+    const [isRedirecting, setIsRedirecting] = useState(false); // NEW: Loading state
+
+    const handleEditClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (onClick) {
+            setIsRedirecting(true);
+            onClick();
+        }
+    };
 
     const renderManually = async () => {
         const canvas = fabricRef.current;
@@ -197,26 +208,50 @@ export const TemplatePreview = ({
     }, [json]);
 
     return (
-   <div className="group relative">
-    <div
-        ref={containerRef}
-        
-        className="relative w-full border rounded-xl overflow-hidden aspect-[1.24/1] shadow-sm bg-white cursor-pointer"
-        onClick={onClick}
-    >
-        {!ready && <div className="absolute inset-0 bg-slate-50 animate-pulse" />}
-        
-        {/* ADDED style to prevent the canvas from overriding the cursor */}
-        <canvas ref={canvasRef} style={{ cursor: 'pointer' }} />
-    </div>
+  <div className="group relative flex flex-col">
+            <div
+                ref={containerRef}
+                className={cn(
+                    "relative w-full border rounded-2xl overflow-hidden aspect-[1.24/1] shadow-sm bg-white cursor-pointer transition-all duration-300",
+                    "hover:shadow-xl hover:border-brand-primary/20",
+                    isRedirecting && "cursor-wait"
+                )}
+                onClick={handleEditClick}
+                style={{ cursor: 'pointer' }}
+            >
+                {!ready && <div className="absolute inset-0 bg-slate-50 animate-pulse" />}
+                
+                <div className="absolute inset-0 pointer-events-none">
+                    <canvas ref={canvasRef} />
+                </div>
+            
 
-    {admin && (
-        <div className="mt-2 flex gap-2">
-            {/* Added cursor-pointer to buttons just in case */}
-            <button onClick={onEdit} className="flex-1 bg-slate-900 text-white text-[10px] py-2 rounded-lg font-bold cursor-pointer">EDIT</button>
-            <button onClick={onDelete} className="flex-1 bg-rose-50 text-rose-600 text-[10px] py-2 rounded-lg font-bold cursor-pointer">DELETE</button>
+                {/* 1. HOVER BUTTON OVERLAY */}
+               
+
+                {/* 2. LOADING SCREEN (Fades in after click) */}
+                {isRedirecting && (
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center z-50 animate-in fade-in duration-300">
+                        <div className="relative">
+                            <Loader2 className="size-10 text-white animate-spin" />
+                            <div className="absolute inset-0 blur-lg bg-brand-primary/50 animate-pulse" />
+                        </div>
+                        <p className="mt-4 text-white text-[10px] font-black tracking-[0.2em] uppercase">
+                            Initializing Canvas
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* Admin Controls (Stay below as requested or if needed) */}
+            {admin && (
+                <div className="mt-3 flex gap-2">
+                    <button onClick={onEdit} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-900 text-[10px] py-2.5 rounded-xl font-bold transition-colors">EDIT SOURCE</button>
+                    <button onClick={onDelete} className="px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors">
+                        <Trash className="size-4" />
+                    </button>
+                </div>
+            )}
         </div>
-    )}
-</div>
     );
 };

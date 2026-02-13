@@ -30,9 +30,9 @@ export const Footer = () => {
 
                     {/* Product Column */}
                     <div className="space-y-4">
-                        <h4 className="font-bold text-sm uppercase tracking-widest text-indigo-500">Design Tools</h4>
+                        <h4 className="font-bold text-sm uppercase tracking-widest text-brand-light">Design Tools</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
-                            <li><Link href="/logos" className="hover:text-white transition">Logo Maker</Link></li>
+                            <li><Link href="/" className="hover:text-white transition">Logo Maker</Link></li>
                             <li><Link href="/business-cards" className="hover:text-white transition opacity-50 cursor-not-allowed">Business Cards (Soon)</Link></li>
                             <li><Link href="/flyers" className="hover:text-white transition opacity-50 cursor-not-allowed">Flyers (Soon)</Link></li>
                             <li><Link href="/templates" className="hover:text-white transition">Browse Templates</Link></li>
@@ -41,7 +41,7 @@ export const Footer = () => {
 
                     {/* Resources Column */}
                     <div className="space-y-4">
-                        <h4 className="font-bold text-sm uppercase tracking-widest text-indigo-500">Resources</h4>
+                        <h4 className="font-bold text-sm uppercase tracking-widest text-brand-light">Resources</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
                             <li><Link href="#" className="hover:text-white transition">Pricing</Link></li>
                             <li><Link href="#" className="hover:text-white transition">Affiliate Program</Link></li>
@@ -52,14 +52,14 @@ export const Footer = () => {
 
                     {/* Newsletter Column */}
                     <div className="space-y-4">
-                        <h4 className="font-bold text-sm uppercase tracking-widest text-indigo-500">Stay Updated</h4>
+                        <h4 className="font-bold text-sm uppercase tracking-widest text-brand-light">Stay Updated</h4>
                         <p className="text-xs text-gray-400">Get design tips and new template alerts.</p>
                         <div className="flex gap-2">
                             <input
                                 placeholder="Email address"
-                                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 w-full"
+                                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand-light w-full"
                             />
-                            <button className="bg-indigo-600 hover:bg-indigo-500 p-2 rounded-lg transition">
+                            <button className="bg-brand-primary hover:bg-brand-light p-2 rounded-lg transition">
                                 <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>
