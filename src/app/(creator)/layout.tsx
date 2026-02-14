@@ -4,13 +4,13 @@ import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { FONT_VARIABLES } from "@/lib/brand-fonts";
 import { Navbar } from "./navbar";
-import { Footer } from "./logos/footer";
+import { Footer } from "./footer";
 import { LoadingBar } from "@/components/ui/loading-bar";
 
 
 
 export const metadata: Metadata = {
-    title: "Logomust.com",
+    title: "Logomust.com - Identity Crafted In Minutes.",
     description: "AI-powered logo design and branding tools for creators. Transform your ideas into stunning logos, business cards, and more with our intuitive platform. Start building your brand identity today!",
 };
 

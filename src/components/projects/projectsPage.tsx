@@ -11,21 +11,21 @@ import { ProjectPreview } from "./project-preview";
 
 const TABS = [
     { label: "Saved Logos", value: "logos", href: "/saved-logos" },
-    { label: "Business Cards", value: "business-cards", href: "/saved-business-cards" },
-    { label: "Flyers", value: "flyers", href: "/saved-flyers" },
+    { label: "Business Cards (Soon)", value: "business-cards", href: "#" },
+    { label: "Flyers (Soon)", value: "flyers", href: "#" },
 ];
 
 export default function ProjectsPage() {
     const pathname = usePathname();
     const router = useRouter();
-    
+
     // Using your custom hook to fetch projects from the API
-    const { 
-        data, 
-        isLoading, 
-        fetchNextPage, 
-        hasNextPage, 
-        isFetchingNextPage 
+    const {
+        data,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
     } = useGetProjects();
 
     // Flattening the infinite query pages into a single array
@@ -47,15 +47,15 @@ export default function ProjectsPage() {
                             href={tab.href}
                             className={cn(
                                 "px-6 py-3 text-sm font-semibold transition-all relative",
-                                pathname === tab.href 
-                                    ? "text-blue-600 border-b-2 border-blue-600" 
+                                pathname === tab.href
+                                    ? "text-brand-primary border-b-2 border-brand-primary"
                                     : "text-slate-500 hover:text-slate-800"
                             )}
                         >
                             {tab.label}
                         </Link>
                     ))}
-                </div>              
+                </div>
 
                 {/* Loading State */}
                 {isLoading && (
@@ -65,12 +65,25 @@ export default function ProjectsPage() {
                     </div>
                 )}
 
+                {!isLoading && projects.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <p className="text-slate-500 mt-4 font-medium">No saved designs found. Start creating your first design!</p>
+                        <Button
+                            onClick={() => router.push("/")}
+                            className="mt-6 bg-brand-primary hover:bg-brand-light text-white"
+                        >
+                            Create New Logo
+                        </Button>
+                    </div>
+                )}
+
+
                 {/* Project Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {projects.map((project: any) => {
                         // CRITICAL FIX: Parse the JSON if it's arriving as a string
-                        const parsedJson = typeof project.json === "string" 
-                            ? JSON.parse(project.json) 
+                        const parsedJson = typeof project.json === "string"
+                            ? JSON.parse(project.json)
                             : project.json;
 
                         return (
@@ -87,7 +100,7 @@ export default function ProjectsPage() {
                                     <h3 className="text-[11px] font-black text-slate-700 uppercase tracking-widest truncate mb-4">
                                         {project.name || "Untitled Design"}
                                     </h3>
-                                    <Button 
+                                    <Button
                                         onClick={() => router.push(`/editor/${project.id}`)}
                                         className="w-full bg-brand-primary hover:bg-brand-light text-white text-xs font-bold h-9"
                                     >
@@ -113,6 +126,6 @@ export default function ProjectsPage() {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

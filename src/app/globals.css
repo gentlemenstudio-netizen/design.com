@@ -75,6 +75,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -89,4 +90,20 @@ body {
   box-shadow: none !important;
   border-radius: 0.5rem !important;
   overflow: hidden !important;
+}
+
+/* app/globals.css */
+
+#nprogress .bar {
+  background: #9B1B1B !important;
+  /* Match your logo's dark red */
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #9B1B1B, 0 0 5px #9B1B1B !important;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #9B1B1B !important;
+  border-left-color: #9B1B1B !important;
 }

@@ -20,7 +20,7 @@ export const Navbar = () => {
 
         {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-x-8">
-          <Link href="/" className="flex items-center gap-x-1 hover:text-indigo-400 transition font-medium text-[15px]">
+          <Link href="/" className="flex items-center gap-x-1 hover:text-brand-light transition font-medium text-[15px]">
             Logos <ChevronDown className="w-4 h-4 opacity-50" />
           </Link>
           {/* <Link href="/business-cards" className="flex items-center gap-x-1 hover:text-indigo-400 transition font-medium text-[15px]">

@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { 
-    ArrowRight, 
-    Loader2, 
-    Sparkles, 
-    CheckCircle, 
-    Zap, 
-    MousePointer2, 
-    Download, 
-    LayoutTemplate 
+import {
+    ArrowRight,
+    Loader2,
+    Sparkles,
+    CheckCircle,
+    Zap,
+    MousePointer2,
+    Download,
+    LayoutTemplate
 } from "lucide-react";
 import NProgress from "nprogress";
 import Image from "next/image";
@@ -24,7 +24,7 @@ export default function LogoHomePage() {
     const handleGenerate = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         if (!brand.trim()) return;
-        
+
         NProgress.start();
         setIsGenerating(true);
         router.push(`/logos/templates?brand=${encodeURIComponent(brand)}`);
@@ -35,7 +35,7 @@ export default function LogoHomePage() {
             {/* HERO SECTION */}
             <section className="relative bg-black text-white pt-24 pb-20 px-4 overflow-hidden">
                 {/* Background Ambient Glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-500/10 via-transparent to-transparent pointer-events-none" />
 
                 <div className="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
                     <div className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full text-brand-light text-sm font-bold mb-8 border border-white/10">
@@ -46,81 +46,101 @@ export default function LogoHomePage() {
                     <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6 leading-[0.9]">
                         Identity Crafted <br className="hidden md:block" /> In Minutes.
                     </h1>
-                    
+
                     <p className="text-xl text-gray-400 mb-12 font-medium max-w-2xl mx-auto">
-                        Create professional, high-quality logos with our intelligent design platform. 
+                        Create professional, high-quality logos with our intelligent design platform.
                         Customize fonts, colors, and layouts effortlessly—no experience required.
                     </p>
 
-                    <form 
+                    <form
                         onSubmit={handleGenerate}
-                        className="flex w-full max-w-2xl bg-white/95 p-2 rounded-2xl border border-white/10 shadow-2xl focus-within:border-brand-light transition-all mb-20"
+                        className="flex flex-col sm:flex-row w-full max-w-2xl bg-white/95 p-2 rounded-3xl sm:rounded-2xl border border-white/10 shadow-2xl focus-within:border-brand-light transition-all mb-20 gap-2"
                     >
                         <input
                             value={brand}
                             onChange={(e) => setBrand(e.target.value)}
-                            placeholder="Enter your brand name..."
-                            className="flex-1 bg-transparent text-black px-6 py-4 text-lg focus:outline-none placeholder:text-gray-600 font-medium"
+                            placeholder="Enter brand name..."
+                            className="flex-1 bg-transparent text-black px-6 py-4 text-base sm:text-lg focus:outline-none placeholder:text-gray-500 font-medium"
                         />
                         <button
                             type="submit"
                             disabled={isGenerating}
-                            className="bg-brand-primary hover:bg-brand-light text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-70 flex items-center gap-2"
+                            className="bg-brand-primary hover:bg-brand-light text-white font-bold px-6 py-4 sm:px-8 rounded-2xl sm:rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2 h-[56px] sm:h-auto"
                         >
-                            {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create your Logo"}
-                            {!isGenerating && <ArrowRight className="size-5" />}
+                            {isGenerating ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <>
+                                    <span className="whitespace-nowrap">Create your Logo</span>
+                                    <ArrowRight className="size-5 shrink-0" />
+                                </>
+                            )}
                         </button>
                     </form>
 
-                                        {/* COLLAGE SHOWCASE SECTION 
+                    {/* COLLAGE SHOWCASE SECTION 
                             Note: I've used 'aspect-video' and 'aspect-square' to maintain the proportions 
                             seen in professional design collages.
                         */}
-                        <div className="w-full max-w-7xl mx-auto px-4 mt-16 relative">
-                            <div className="grid grid-cols-12 gap-4 h-[600px] md:h-[750px]">
-                                
-                                {/* 1. Main Large Feature (Left Side) */}
-                                <div className="col-span-12 md:col-span-7 row-span-2 bg-[#121212] rounded-[40px] border border-white/10 overflow-hidden relative group">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                    {/* INSERT IMAGE 1 HERE: e.g. <Image src="/collage-main.png" fill className="object-cover" /> */}
-                                     <Image src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVztvuVxn3ok60wBHIZYQW3N9Eg27seyti1PJSh" alt="Sample Logo" fill className="object-cover opacity-50" />
-                                    <div className="absolute bottom-8 left-8">
-                                        <p className="text-white/30 text-xs font-bold uppercase tracking-widest">Featured Brand Kit</p>
-                                    </div>
-                                </div>
+                    <div className="w-full max-w-7xl mx-auto px-4 mt-16 relative">
+                        <div className="grid grid-cols-12 gap-4 md:grid-rows-2 md:h-[700px]">
 
-                                {/* 2. Top Right Square */}
-                                <div className="col-span-6 md:col-span-5 bg-[#1a1a1a] rounded-[40px] border border-white/10 overflow-hidden relative">
-                                    {/* INSERT IMAGE 2 HERE: e.g. <Image src="/collage-top-right.png" fill className="object-cover" /> */}
-                                     <Image src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVzzP3Tq3eZpPNJvhEcdTkMUfgouIOmrnQaSxVz" alt="Sample Logo" fill className="object-cover opacity-50" />
+                            {/* 1. Main Large Feature (Left) */}
+                            <div className="col-span-12 md:col-span-7 md:row-span-2 bg-[#121212] rounded-[32px] md:rounded-[40px] border border-white/10 overflow-hidden relative group aspect-[4/3] md:aspect-auto">
+                                <Image
+                                    src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVztvuVxn3ok60wBHIZYQW3N9Eg27seyti1PJSh"
+                                    alt="Featured Brand Kit"
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div className="absolute bottom-8 left-8">
+                                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/5">
+                                        Featured Brand Kit
+                                    </p>
                                 </div>
-
-                                {/* 3. Bottom Middle (Staggered) */}
-                                <div className="col-span-6 md:col-span-3 bg-[#1a1a1a] rounded-[40px] border border-white/10 overflow-hidden relative -translate-y-12 md:translate-y-0">
-                                    {/* INSERT IMAGE 3 HERE: e.g. <Image src="/collage-bot-1.png" fill className="object-cover" /> */}
-                                    <Image src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVzr8W6lFIlsHpW4iO0SxCmYQueG9oqKAt1Zk3M" alt="Sample Logo" fill className="object-cover opacity-50" />
-                                </div>
-
-                                {/* 4. Bottom Right Accent */}
-                                <div className="hidden md:block md:col-span-2 bg-brand-ultralight rounded-[40px] overflow-hidden relative group cursor-pointer">
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Sparkles className="size-12 text-white/50 group-hover:scale-110 transition-transform" />
-                                    </div>
-                                    {/* OR INSERT IMAGE 4 HERE */}
-                                        <Image src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVzaaLypzR1hZijlDGrupocIbLV8TwgAyx95nO0" alt="Sample Logo" fill className="object-cover opacity-50" />
-                                </div>
-
                             </div>
 
-                            {/* Floating Decorative Elements (Matches the "Flyer" feel in your attachment) */}
-                            <div className="absolute -top-10 -right-6 hidden lg:block animate-bounce duration-[5000ms]">
-                                <div className="bg-white p-4 rounded-2xl shadow-2xl rotate-12 border border-slate-200">
-                                    <div className="size-12 bg-brand-ultralight rounded-lg flex items-center justify-center">
-                                        <CheckCircle className="text-brand-primary size-6" />
-                                    </div>
+                            {/* 2. Top Right (Blue Print) */}
+                            <div className="col-span-6 md:col-span-5 md:row-span-1 bg-[#1a1a1a] rounded-[24px] md:rounded-[40px] border border-white/10 overflow-hidden relative aspect-square md:aspect-auto">
+                                <Image
+                                    src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVzzP3Tq3eZpPNJvhEcdTkMUfgouIOmrnQaSxVz"
+                                    alt="Logo Blueprint"
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+
+                            {/* 3. Bottom Middle (Color Palette) */}
+                            <div className="col-span-6 md:col-span-3 md:row-span-1 bg-[#1a1a1a] rounded-[24px] md:rounded-[40px] border border-white/10 overflow-hidden relative aspect-square md:aspect-auto">
+                                <Image
+                                    src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVzr8W6lFIlsHpW4iO0SxCmYQueG9oqKAt1Zk3M"
+                                    alt="Color Intelligence"
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+
+                            {/* 4. Bottom Right Accent (Master Files) */}
+                            <div className="hidden md:block md:col-span-2 md:row-span-1 bg-brand-primary rounded-[40px] overflow-hidden relative group">
+                                <Image
+                                    src="https://n11asj8ry1.ufs.sh/f/oTHHZ2dBnWVzaaLypzR1hZijlDGrupocIbLV8TwgAyx95nO0"
+                                    alt="Export Formats"
+                                    fill
+                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                            </div>
+
+                        </div>
+
+                        {/* Floating Success Indicator - Refined for Logomust colors */}
+                        <div className="absolute -top-12 -right-4 hidden lg:block animate-bounce duration-[6000ms]">
+                            <div className="bg-white p-4 rounded-2xl shadow-[0_20px_50px_rgba(155,27,27,0.2)] rotate-12 border border-slate-100">
+                                <div className="size-12 bg-red-50 rounded-xl flex items-center justify-center">
+                                    <CheckCircle className="text-brand-primary size-6" />
                                 </div>
                             </div>
                         </div>
+                    </div>
                 </div>
             </section>
 
@@ -159,10 +179,10 @@ export default function LogoHomePage() {
                                 High-quality logos, <br /> No design skills needed.
                             </h2>
                             <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                                Launching a startup or growing a small business? Our platform combines smart automation 
+                                Launching a startup or growing a small business? Our platform combines smart automation
                                 with creative flexibility to design logos that look premium and unique.
                             </p>
-                            
+
                             <div className="space-y-4">
                                 {[
                                     "Unlimited Logo Packs for every niche",
@@ -178,8 +198,8 @@ export default function LogoHomePage() {
                                     </div>
                                 ))}
                             </div>
-                            
-                            <Button size="lg" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth'})} className="rounded-2xl h-14 px-10 bg-black hover:bg-slate-800">
+
+                            <Button size="lg" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-2xl h-14 px-10 bg-black hover:bg-slate-800">
                                 Start Your Design
                             </Button>
                         </div>
@@ -204,7 +224,7 @@ export default function LogoHomePage() {
 
 // Reusable Button component for the page if not already in your UI folder
 const Button = ({ children, className, onClick, size }: any) => (
-    <button 
+    <button
         onClick={onClick}
         className={cn(
             "inline-flex items-center justify-center font-bold transition-all active:scale-95 text-white",

@@ -1,8 +1,13 @@
 import Link from "next/link";
+import Image from "next/image";
+import { Space_Grotesk } from "next/font/google";
 import { Facebook, Instagram, Twitter, Github, ArrowRight } from "lucide-react";
-import { Logo } from "@/app/(dashboard)/logo";
+import { cn } from "@/lib/utils";
 // Adjust path to your Logo component
-
+const font = Space_Grotesk({
+    weight: ["700"],
+    subsets: ["latin"],
+});
 export const Footer = () => {
     return (
         <footer className="bg-black text-white border-t border-white/10">
@@ -10,8 +15,13 @@ export const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
 
                     {/* Brand Column */}
-                    <div className="col-span-1 md:col-span-1 space-y-6">
-                        <Logo />
+                    <div className="col-span-1 md:col-span-1 space-y-3">
+                        <div className="flex items-center gap-x-2 hover:opacity-75 transition ">
+                            <div className="size-8 relative">
+                                <Image src="/logo.svg" alt="The Canvas" fill />
+                            </div>
+                            <h1 className={cn(font.className, "text-xl font-bold")}>Logomust.com</h1>
+                        </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             Empowering creators with AI-driven branding tools. Start your journey from a single idea to a professional brand identity in minutes.
                         </p>
@@ -35,7 +45,6 @@ export const Footer = () => {
                             <li><Link href="/" className="hover:text-white transition">Logo Maker</Link></li>
                             <li><Link href="/business-cards" className="hover:text-white transition opacity-50 cursor-not-allowed">Business Cards (Soon)</Link></li>
                             <li><Link href="/flyers" className="hover:text-white transition opacity-50 cursor-not-allowed">Flyers (Soon)</Link></li>
-                            <li><Link href="/templates" className="hover:text-white transition">Browse Templates</Link></li>
                         </ul>
                     </div>
 
@@ -46,7 +55,6 @@ export const Footer = () => {
                             <li><Link href="#" className="hover:text-white transition">Pricing</Link></li>
                             <li><Link href="#" className="hover:text-white transition">Affiliate Program</Link></li>
                             <li><Link href="#" className="hover:text-white transition">Help Center</Link></li>
-                            <li><Link href="#" className="hover:text-white transition">API Documentation</Link></li>
                         </ul>
                     </div>
 
@@ -79,6 +87,6 @@ export const Footer = () => {
                 </div>
             </div>
         </footer>
-        
+
     );
 };
