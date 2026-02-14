@@ -83,7 +83,7 @@ export default function PricingPage() {
 
                         {/* Right Side: Feature List */}
                         <div className="bg-white/5 rounded-[32px] p-8 border border-white/5">
-                            <h4 className="text-sm font-black uppercase tracking-widest text-gray-400 mb-6">What's included:</h4>
+                            <h4 className="text-sm font-black uppercase tracking-widest text-gray-400 mb-6">What&apos;s included:</h4>
                             <ul className="space-y-4">
                                 {plan.features.map((feature) => (
                                     <li key={feature} className="flex items-start gap-3">
