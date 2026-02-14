@@ -92,7 +92,7 @@ export default function ProjectsPage() {
                                     <TemplatePreview
                                         json={parsedJson} // Pass parsed object here
                                         admin={false}
-                                        onEdit={() => router.push(`/editor/${project.id}`)}
+                                        onEdit={() => router.push(`/logo-editor/${project.id}`)}
                                         onDelete={() => console.log("Delete design")}
                                     />
                                 </div>
@@ -101,7 +101,7 @@ export default function ProjectsPage() {
                                         {project.name || "Untitled Design"}
                                     </h3>
                                     <Button
-                                        onClick={() => router.push(`/editor/${project.id}`)}
+                                        onClick={() => router.push(`/logo-editor/${project.id}`)}
                                         className="w-full bg-brand-primary hover:bg-brand-light text-white text-xs font-bold h-9"
                                     >
                                         Customize

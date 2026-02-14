@@ -43,13 +43,13 @@ export const TemplatePreview = ({
     const renderManually = async () => {
         const canvas = fabricRef.current;
         const container = containerRef.current;
-        
+
         if (!canvas || !container || !json?.objects) return;
 
         const width = container.offsetWidth;
         const height = container.offsetHeight;
         const CENTER_X = width / 2;
-        const PADDING = 24; // Side padding
+        const PADDING = width < 500 ? 16 : 24;
 
         canvas.setWidth(width);
         canvas.setHeight(height);
@@ -65,7 +65,7 @@ export const TemplatePreview = ({
             container.style.backgroundColor = backgroundData.fill;
         }
 
-        let currentTop = 30; // Start a bit lower
+        let currentTop = width < 300 ? 16 : 30; // Start a bit lower
 
         // 1. Render Logo
         if (logoData) {
@@ -86,7 +86,7 @@ export const TemplatePreview = ({
 
                 // Increase logo size (50% of card height)
                 logo.scaleToHeight(height * 0.48);
-                
+
                 // If it's too wide, scale to width
                 if (logo.getBoundingRect().width > width - PADDING * 2) {
                     logo.scaleToWidth(width - PADDING * 2);
@@ -104,80 +104,80 @@ export const TemplatePreview = ({
 
         // 2. Render Text with Auto-Size
         function renderTextElements(topPos: number) {
-    const currentCanvas = fabricRef.current;
-    if (!currentCanvas) return;
+            const currentCanvas = fabricRef.current;
+            if (!currentCanvas) return;
 
-    if (brandData) {
-        // 1. Create the Brand Textbox
-        const brand = new fabric.Textbox(brandData.text || "BRAND", {
-            left: CENTER_X,
-            top: topPos,
-            originX: "center",
-            originY: "top",
-            fontSize: 42, 
-            lineHeight: 0.9,
-            fontFamily: brandData.fontFamily || "Arial",
-            fill: brandData.fill || "#000000",
-            fontWeight: brandData.fontWeight || "bold",
-            charSpacing: brandData.charSpacing || 0,
-            textAlign: "center",
-            width: width - (PADDING * 2), // Set the boundary
-            splitByGrapheme: false, // Prevents breaking words in the middle
-            selectable: false, 
-            shadow: brandData.shadow ? new fabric.Shadow(brandData.shadow) : undefined,
-            stroke: brandData.stroke ? brandData.stroke : undefined,
-            strokeWidth: brandData.strokeWidth || 0,
-            evented: false,
-            lockMovementX: true, // Extra safety
-            lockMovementY: true,
-        });
+            if (brandData) {
+                // 1. Create the Brand Textbox
+                const brand = new fabric.Textbox(brandData.text || "BRAND", {
+                    left: CENTER_X,
+                    top: topPos,
+                    originX: "center",
+                    originY: "top",
+                    fontSize: width < 300 ? 32 : 42,
+                    lineHeight: 0.9,
+                    fontFamily: brandData.fontFamily || "Arial",
+                    fill: brandData.fill || "#000000",
+                    fontWeight: brandData.fontWeight || "bold",
+                    charSpacing: brandData.charSpacing || 0,
+                    textAlign: "center",
+                    width: width - (PADDING * 2), // Set the boundary
+                    splitByGrapheme: false, // Prevents breaking words in the middle
+                    selectable: false,
+                    shadow: brandData.shadow ? new fabric.Shadow(brandData.shadow) : undefined,
+                    stroke: brandData.stroke ? brandData.stroke : undefined,
+                    strokeWidth: brandData.strokeWidth || 0,
+                    evented: false,
+                    lockMovementX: true, // Extra safety
+                    lockMovementY: true,
+                });
 
-        // 2. Shrink Font to stay on one line
-        // We use measureLine(0).width to see how long the actual text is
-        let currentBrandSize = brand.fontSize || 40;
-        while (brand.measureLine(0).width > (width - PADDING * 2.5) && currentBrandSize > 8) {
-            currentBrandSize -= 1;
-            brand.set("fontSize", currentBrandSize);
-        }
-        
-        // Final safety: ensure the width of the box is wide enough for the new size
-        brand.set("width", width - PADDING); 
-        currentCanvas.add(brand);
+                // 2. Shrink Font to stay on one line
+                // We use measureLine(0).width to see how long the actual text is
+                let currentBrandSize = brand.fontSize || 40;
+                while (brand.measureLine(0).width > (width - PADDING * 2.5) && currentBrandSize > 8) {
+                    currentBrandSize -= 1;
+                    brand.set("fontSize", currentBrandSize);
+                }
 
-        // 3. Handle Tagline
-        if (taglineData) {
-            const brandBottom = brand.getBoundingRect().top + brand.getBoundingRect().height;
-            const tagline = new fabric.Textbox(taglineData.text || "", {
-                left: CENTER_X,
-                top: brandBottom -5,
-                originX: "center",
-                originY: "top",
-                fontSize: 16,
-                fontFamily: taglineData.fontFamily || "Arial",
-                fill: taglineData.fill || "#666666",
-                textAlign: "center",
-                width: width - PADDING * 2,
-                charSpacing:taglineData.charSpacing || 0,
-                selectable: false,
-                shadow: taglineData.shadow ? new fabric.Shadow(taglineData.shadow) : undefined,
-                stroke: taglineData.stroke ? taglineData.stroke : undefined,
-                strokeWidth: taglineData.strokeWidth || 0,
-                evented: false,
-            });
+                // Final safety: ensure the width of the box is wide enough for the new size
+                brand.set("width", width - PADDING);
+                currentCanvas.add(brand);
 
-            let currentTaglineSize = 12;
-            while (tagline.measureLine(0).width > (width - PADDING * 2) && currentTaglineSize > 6) {
-                currentTaglineSize -= 0.5;
-                tagline.set("fontSize", currentTaglineSize);
+                // 3. Handle Tagline
+                if (taglineData) {
+                    const brandBottom = brand.getBoundingRect().top + brand.getBoundingRect().height;
+                    const tagline = new fabric.Textbox(taglineData.text || "", {
+                        left: CENTER_X,
+                        top: brandBottom - 5,
+                        originX: "center",
+                        originY: "top",
+                        fontSize: width < 300 ? 8 : 16,
+                        fontFamily: taglineData.fontFamily || "Arial",
+                        fill: taglineData.fill || "#666666",
+                        textAlign: "center",
+                        width: width - PADDING * 2,
+                        charSpacing: taglineData.charSpacing || 0,
+                        selectable: false,
+                        shadow: taglineData.shadow ? new fabric.Shadow(taglineData.shadow) : undefined,
+                        stroke: taglineData.stroke ? taglineData.stroke : undefined,
+                        strokeWidth: taglineData.strokeWidth || 0,
+                        evented: false,
+                    });
+
+                    let currentTaglineSize = 12;
+                    while (tagline.measureLine(0).width > (width - PADDING * 2) && currentTaglineSize > 6) {
+                        currentTaglineSize -= 0.5;
+                        tagline.set("fontSize", currentTaglineSize);
+                    }
+                    currentCanvas.add(tagline);
+                }
             }
-            currentCanvas.add(tagline);
-        }
-    }
 
-    currentCanvas.renderAll();
-    setReady(true);
-    onLoaded?.();
-}
+            currentCanvas.renderAll();
+            setReady(true);
+            onLoaded?.();
+        }
     };
 
     useEffect(() => {
@@ -208,7 +208,7 @@ export const TemplatePreview = ({
     }, [json]);
 
     return (
-  <div className="group relative flex flex-col">
+        <div className="group relative flex flex-col">
             <div
                 ref={containerRef}
                 className={cn(
@@ -220,14 +220,14 @@ export const TemplatePreview = ({
                 style={{ cursor: 'pointer' }}
             >
                 {!ready && <div className="absolute inset-0 bg-slate-50 animate-pulse" />}
-                
+
                 <div className="absolute inset-0 pointer-events-none">
                     <canvas ref={canvasRef} />
                 </div>
-            
+
 
                 {/* 1. HOVER BUTTON OVERLAY */}
-               
+
 
                 {/* 2. LOADING SCREEN (Fades in after click) */}
                 {isRedirecting && (

@@ -11,7 +11,7 @@ import {
   ActiveTool,
   selectionDependentTools
 } from "@/features/editor/types";
-import { Navbar } from "@/features/editor/components/navbar";
+import { LogoNavbar } from "@/features/editor/components/logo-navbar";
 import { Footer } from "@/features/editor/components/footer";
 import { useEditor } from "@/features/editor/hooks/use-editor";
 import { Sidebar } from "@/features/editor/components/sidebar";
@@ -117,7 +117,7 @@ export const LogoEditor = ({ initialData, mode }: LogoEditorProps) => {
 
   return (
     <div className="h-full flex flex-col">
-      <Navbar
+      <LogoNavbar
         id={initialData.id}
         editor={editor}
         activeTool={activeTool}
