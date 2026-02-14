@@ -1,14 +1,44 @@
+"use client"; // <--- Add this at the very top
 import Link from "next/link";
 import Image from "next/image";
 import { Space_Grotesk } from "next/font/google";
-import { Facebook, Instagram, Twitter, Github, ArrowRight } from "lucide-react";
+import { Facebook, Instagram, Twitter, Github, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 // Adjust path to your Logo component
 const font = Space_Grotesk({
     weight: ["700"],
     subsets: ["latin"],
 });
 export const Footer = () => {
+    const [email, setEmail] = useState("");
+    const [isSubscribing, setIsSubscribing] = useState(false);
+
+    const handleNewsletter = async (e?: React.FormEvent) => {
+        e?.preventDefault();
+        if (!email) return;
+
+        setIsSubscribing(true);
+
+        try {
+            const response = await fetch("/api/newsletter", {
+                method: "POST",
+                body: JSON.stringify({ email }),
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (response.ok) {
+                setEmail("");
+                // Replace with your toast library if you have one
+                alert("Welcome to the inner circle! Check your inbox soon.");
+            }
+        } catch (error) {
+            console.error("Newsletter error:", error);
+        } finally {
+            setIsSubscribing(false);
+        }
+    };
+
     return (
         <footer className="bg-black text-white border-t border-white/10">
             <div className="max-w-7xl mx-auto px-8 py-16">
@@ -62,15 +92,29 @@ export const Footer = () => {
                     <div className="space-y-4">
                         <h4 className="font-bold text-sm uppercase tracking-widest text-brand-light">Stay Updated</h4>
                         <p className="text-xs text-gray-400">Get design tips and new template alerts.</p>
-                        <div className="flex gap-2">
+
+                        <form onSubmit={handleNewsletter} className="flex gap-2">
                             <input
+                                type="email"
+                                required
+                                value={email} // Link to your state
+                                onChange={(e) => setEmail(e.target.value)} // Update state on type
                                 placeholder="Email address"
-                                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand-light w-full"
+                                disabled={isSubscribing}
+                                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand-primary w-full disabled:opacity-50"
                             />
-                            <button className="bg-brand-primary hover:bg-brand-light p-2 rounded-lg transition">
-                                <ArrowRight className="w-4 h-4" />
+                            <button
+                                type="submit"
+                                disabled={isSubscribing}
+                                className="bg-brand-primary hover:bg-brand-hover p-2 rounded-lg transition disabled:opacity-50 flex items-center justify-center min-w-[40px]"
+                            >
+                                {isSubscribing ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <ArrowRight className="w-4 h-4" />
+                                )}
                             </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
 
